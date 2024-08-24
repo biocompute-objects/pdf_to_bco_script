@@ -1,0 +1,3385 @@
+<!DOCTYPE article PUBLIC "-//NLM//DTD JATS (Z39.96) Journal Archiving and Interchange DTD v1.0 20120330//EN" "JATS-archivearticle1.dtd">
+<article xmlns:xlink="http://www.w3.org/1999/xlink">
+  <front>
+    <journal-meta>
+      <journal-title-group>
+        <journal-title>Int. J. Mol. Sci.</journal-title>
+      </journal-title-group>
+    </journal-meta>
+    <article-meta>
+      <article-id pub-id-type="doi">10.3390/ijms161125952</article-id>
+      <title-group>
+        <article-title>Computational Prediction of RNA-Binding Proteins and Binding Sites</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author">
+          <string-name>Jingna Si</string-name>
+          <email>jingnasi@bjfu.edu.cn</email>
+        </contrib>
+        <contrib contrib-type="author">
+          <string-name>Jing Cui</string-name>
+        </contrib>
+        <contrib contrib-type="author">
+          <string-name>Jin Cheng</string-name>
+          <email>chengjin@bjfu.edu.cn</email>
+        </contrib>
+        <contrib contrib-type="author">
+          <string-name>Rongling Wu</string-name>
+        </contrib>
+      </contrib-group>
+      <pub-date>
+        <year>2015</year>
+      </pub-date>
+      <volume>16</volume>
+      <fpage>26303</fpage>
+      <lpage>26317</lpage>
+      <history>
+        <date date-type="accepted">
+          <day>23</day>
+          <month>10</month>
+          <year>2015</year>
+        </date>
+        <date date-type="received">
+          <day>1</day>
+          <month>10</month>
+          <year>2015</year>
+        </date>
+      </history>
+      <abstract>
+        <p>Proteins and RNA interaction have vital roles in many cellular processes such as protein synthesis, sequence encoding, RNA transfer, and gene regulation at the transcriptional and post-transcriptional levels. Approximately 6%-8% of all proteins are RNA-binding proteins (RBPs). Distinguishing these RBPs or their binding residues is a major aim of structural biology. Previously, a number of experimental methods were developed for the determination of protein-RNA interactions. However, these experimental methods are expensive, time-consuming, and labor-intensive. Alternatively, researchers have developed many computational approaches to predict RBPs and protein-RNA binding sites, by combining various machine learning methods and abundant sequence and/or structural features. There are three kinds of computational approaches, which are prediction from protein sequence, prediction from protein structure, and protein-RNA docking. In this paper, we review all existing studies of predictions of RNA-binding sites and RBPs and complexes, including data sets used in different approaches, sequence and structural features used in several predictors, prediction method classifications, performance comparisons, evaluation methods, and future directions.</p>
+      </abstract>
+      <kwd-group>
+        <kwd>RNA-binding proteins (RBPs)</kwd>
+        <kwd>RNA-binding site</kwd>
+        <kwd>bioinformatics</kwd>
+        <kwd>prediction</kwd>
+        <kwd>macromolecular docking</kwd>
+      </kwd-group>
+    </article-meta>
+  </front>
+  <body>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Computational prediction.images\img_1_1.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Computational prediction.images\img_1_2.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Computational prediction.images\img_2_1.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Computational prediction.images\img_2_2.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Computational prediction.images\img_2_3.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Computational prediction.images\img_15_1.png" />
+    </fig>
+    <sec id="sec-1">
+      <title>1. Introduction</title>
+      <p>
+        Approximately 6%–8% of proteins are RNA-binding proteins (RBPs). These RBPs play an
+important part in gene expression and regulation. Due to study limitations, only a few types of RBPs
+have been identified such as HuR, AUF1, TTP, TIA1, and CUGBP2. These RBPs perform essential
+roles in various biological processes such as mRNA stability [
+        <xref ref-type="bibr" rid="ref1">1</xref>
+        ], stress responses [
+        <xref ref-type="bibr" rid="ref2">2</xref>
+        ], cell cycle, tumor
+differentiation [
+        <xref ref-type="bibr" rid="ref3">3</xref>
+        ], apoptosis, and gene regulation at the transcriptional and post-transcriptional
+levels [
+        <xref ref-type="bibr" rid="ref4">4</xref>
+        ]. Determining the three-dimensional (3D) structures of protein–RNA complexes facilitates
+the identification of physiochemical properties and biological interactions.
+      </p>
+      <p>
+        Experimental methods (e.g., nuclear magnetic resonance spectroscopy (NMR) [
+        <xref ref-type="bibr" rid="ref5">5</xref>
+        ] and X-ray
+crystallography [
+        <xref ref-type="bibr" rid="ref6">6</xref>
+        ]) typically used for protein–RNA complex structure determination are expensive,
+time-consuming and labor-intensive. To date, 2274 protein–RNA complex structures determined by
+experimental methods have been deposited in the Protein Data Bank (PDB) database [
+        <xref ref-type="bibr" rid="ref7">7</xref>
+        ]. The number
+of protein–RNA complexes in the PDB database is significantly fewer than that which exists in nature.
+Given the large numbers of nucleic acid and protein sequences that exist, improved knowledge of
+how protein–RNA interactions occur could help us to recognize functional information.
+      </p>
+      <p>To achieve this goal, it is necessary to develop computational approaches which can reliably
+and rapidly identify RAN-binding proteins or sites. In contrast with experimental methods,
+computational tools could inexpensively and quickly identify RNA-binding sites and RBPs, which</p>
+      <p>
+        Int. J. Mol. Sci. 2015, 16, page–page
+would be useful and helpful in studying protein–RNA interactions [
+        <xref ref-type="bibr" rid="ref8">8</xref>
+        ]; however, those methods
+basecdomonpluytaotinonaamltionoolsaccoiudldseinqeuxepnecnesiivneflyoramndatqiounickalrye iddeifnfiticfuylRt NsiAnc-beinodrignagnsisitmessaanrdeRhBiPgsh,lwyhciochmplex.
+Sevewraolumldetbheoudssehfualvaenbdeehneldpfeuvleilnopsetuddwyihngichprfootceuins–oRnNpAreidntiecrtainctgioRnNsA[8-];bihnodwinevgesri,ttehsoasnedmdeethteordms ining
+whebthaeserda opnrloyteoinn–aRmNinAo accoimd pseleqxueenxciestisn.fTorhmeamtioanjoarriteydoifffipcrueltvisoinucsesoturgdaineissmhasvaerefohciughselydcoonmpprleexd.iction
+apprSoeavcehraelsmfoerthRodNsAh-abvienbdeienngdseivteelsoapneddwRhBiPchs fboacusesdonopnresdeqicutienngcReNsiAm-bilianrdiitnyg[s9i–te1s2a]n.dTdheeteqrumeirnyinpgrotein
+sequwenhceethsewraerperoseteairnc–hReNdAagcoaminpsltedxaetxaisbtas.sTesh;eimftahjoerhityomofoploregvoiouussssetquudieenscheasvwefeorceuksendoownnpRreNdiAct-iobninding
+approaches for RNA-binding sites and RBPs based on sequence similarity [
+        <xref ref-type="bibr" rid="ref10 ref11 ref12 ref9">9–12</xref>
+        ]. The query protein
+proteins, the query protein was regarded as an RNA-binding protein. Similarly, RNA-binding
+sequences were searched against databases; if the homologous sequences were known RNA-binding
+residues and sites in the query sequence could be detected. For another, methods based on predicted
+proteins, the query protein was regarded as an RNA-binding protein. Similarly, RNA-binding
+structural and sequence information are the most often used computational approaches to identify
+residues and sites in the query sequence could be detected. For another, methods based on predicted
+RNAs-trbuinctduirnaglasnidtesseoqrueRnBcPesin.fIofrtmhaeti3oDn satrreutchteumreoostf oaftteanrguestepdrcootmeipnuitsatkionnoawlanp, pthroeapchreesdticotiidoennbtiafysed on
+strucRtNurAe-bininfodrinmgastiitoensowrRasBPcas.rIrfiethdeo3uDt sttorudctiustrienogfuaisthargReBtPpsro[t1e3in–1is5]k.noItwins,btheeliepvreeddictthioant bthaseedstrounctural
+similsatrruitcytucroeuinl dforpmroavtiiodnewmasorcearrreieldiaboulet atonddisitnin-dgeupisthhRpBrPesdi[c1t3i–o1n5]c. oItnissebqeulieenvceed. thAant oththeesrtrtueccthurnailque is
+confdoormckaintigo,na omfemthoadcrostmaroteledcfurloamr cthoemcpolmexpeosne[n1t6s].coMordaninyatpesr,oatenidn–apimroedteiant mdoocdkeillninggtoinotlesrahctaivone been
+repocrotendfo,rbmuattinoon sopf emciaficcroRmNoAlec–uplraortceoinmdploecxkesin[g16m]. eMthaondy epxriosttesin[–1p7r]o.tSeienvedroaclkpinrgotteoionl–sphraovteeinbeen
+docking
+reported, but no specific RNA–protein docking method exists [
+        <xref ref-type="bibr" rid="ref17">17</xref>
+        ]. Several protein–protein docking
+programs accept RNA and protein coordinates as inputs to generate RBPs, such as HADDOCK [
+        <xref ref-type="bibr" rid="ref18">18</xref>
+        ],
+programs accept RNA and protein coordinates as inputs to generate RBPs, such as HADDOCK [
+        <xref ref-type="bibr" rid="ref18">18</xref>
+        ],
+GRAMM [
+        <xref ref-type="bibr" rid="ref19">19</xref>
+        ], HEX [
+        <xref ref-type="bibr" rid="ref20">20</xref>
+        ], PatchDock [
+        <xref ref-type="bibr" rid="ref21">21</xref>
+        ], and FTDock [
+        <xref ref-type="bibr" rid="ref22">22</xref>
+        ]. The above strategies for RNA-binding site
+      </p>
+      <p>
+        GRAMM [
+        <xref ref-type="bibr" rid="ref19">19</xref>
+        ], HEX [
+        <xref ref-type="bibr" rid="ref20">20</xref>
+        ], PatchDock [
+        <xref ref-type="bibr" rid="ref21">21</xref>
+        ], and FTDock [
+        <xref ref-type="bibr" rid="ref22">22</xref>
+        ]. The above strategies for RNA-binding site
+and RBP prediction are summarized in Figure 1.
+      </p>
+      <p>and RBP prediction are summarized in Figure 1.</p>
+      <p>Moreover, RNA–protein complex docking methods were discussed. We summarize detailed
+for predicting RBPs and RNA-binding sites based on protein sequences or known protein 3D
+information of these computational tools, including various vectors based on sequence and/or
+structures. Moreover, RNA–protein complex docking methods were discussed. We summarize
+structure, datasets used in the algorithm, performance comparison, machine learning methods, and
+detailed information of these computational tools, including various vectors based on sequence
+so on. In particular, we summarize those available web servers for RNA-binding sites and RBP
+and/or structure, datasets used in the algorithm, performance comparison, machine learning
+methods, and so on. In particular, we summarize2those available web servers for RNA-binding sites
+and RBP prediction, which are convenient for scientists. Finally, the future directions and several
+implications have been discussed, which can aid in method development.</p>
+    </sec>
+    <sec id="sec-2">
+      <title>2. Development of Computational Methods for Prediction of RNA-Binding Site</title>
+      <sec id="sec-2-1">
+        <title>2.1. Data Set</title>
+        <p>
+          The sequence and structure of protein–RNA complexes are available from PDB
+database and other specific protein–RNA interaction databases (Available online:
+http://pridb.gdcb.iastate.edu/) [
+          <xref ref-type="bibr" rid="ref25">25</xref>
+          ]. We analyzed several previous studies and summarize the
+datasets and methods used, which are listed in detail in Table 1. Of all existing datasets, RB344 is
+the largest and contains 344 non-redundant RBPs with at least 30% sequence identity [
+          <xref ref-type="bibr" rid="ref26">26</xref>
+          ]. In several
+studies, authors employed the same dataset to compare the advantages and disadvantages of various
+methods. In particular, Cheng et al. [
+          <xref ref-type="bibr" rid="ref27">27</xref>
+          ] constructed a novel PRIPU dataset which differed from
+previous datasets. The PRIPU dataset contained positive and unlabeled, but not negative samples.
+Such negative samples sometimes are not necessarily genuine negative samples and may even be
+unknown positive samples.
+        </p>
+        <p>
+          RNA-binding residues are determined using two definitions: (i) a residue with any atom within
+3–6 Å of any atom in a nucleotide; and (ii) residues involved in hydrophobic, electrostatic interactions
+with nucleotides, van der Waals, or hydrogen-bonding [
+          <xref ref-type="bibr" rid="ref25">25</xref>
+          ]. Residues satisfying these definitions
+are considered to be RNA-binding residues. As with protein–DNA complexes and protein–protein
+complexes, similar sequences in protein–RNA interactions are eliminated before dataset construction.
+Generally, sequences with similarities greater than 30%–40% are considered redundant. Clustering
+programs such as blastclust (available from NCBI), CD-HIT [
+          <xref ref-type="bibr" rid="ref34">34</xref>
+          ], and the PISCES web server are used
+to generate a non-redundant dataset.
+        </p>
+      </sec>
+      <sec id="sec-2-2">
+        <title>2.2. Feature Selection for RNA-Binding Residues and Protein Predictors</title>
+        <p>Many features have been used to identify RBPs and binding sites. There are three kinds of
+features here, which are structure-based features, sequence-based features, chemical and physical
+features. The commonly used features summarized here include amino acid composition, sequence
+similarity, evolutionary information, accessible surface area (ASA), predicted secondary structures
+(SSs), hydrophobicity, electrostatic patches, cleft sizes, and other global protein features. Details of
+these features are shown as follows.</p>
+        <sec id="sec-2-2-1">
+          <title>2.2.1. Sequence-Based Features</title>
+        </sec>
+        <sec id="sec-2-2-2">
+          <title>Amino Acid Composition</title>
+          <p>
+            One of the most commonly used features of protein sequence is protein amino acid composition,
+not only in protein–protein interaction site prediction, but also in RNA-binding site prediction. The 20
+amino acids exhibit various properties based on the presence of hydrophobic residues (G, F, L, M, A, I,
+P, V), polar residues (Q, T, S, N, C, Y, W), and charged residues (H, R, K, E, D) [
+            <xref ref-type="bibr" rid="ref35">35</xref>
+            ]. One of the encoding
+methods are based on the physicochemical properties of the various residue types. The hydrophobic,
+polar, charged and residues are encoded as (1 0), (0 1), and (0 0), respectively. Particularly, the
+positively-charged RNA backbone is usually more likely to combine with the negatively-charged
+residues, as shown in previous studies [
+            <xref ref-type="bibr" rid="ref36">36</xref>
+            ]. The other encoding method is standard binary encoding,
+which encodes each amino acid as a 20-dimensional binary vector, such as E (0 0 0 1 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0), F (0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0), A (1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0), . . . , and Y
+(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1).
+          </p>
+        </sec>
+        <sec id="sec-2-2-3">
+          <title>Sequence Similarity</title>
+          <p>Sequence similarity (also referred to as sequence conservation) is frequently used for
+RNA-binding site prediction. The BLAST and PSI-BLAST programs are used to compare the
+similarities among various protein sequences. Generally, multiple sequence alignment (MSA) were
+obtained by comparing query sequences against the NCBI non-redundant database and were used
+to calculate each residue’s sequence similarity score. A number of conservation scoring tools are
+available including relative entropy, von Neumann entropy, Shannon entropy, and Scorecons.</p>
+        </sec>
+        <sec id="sec-2-2-4">
+          <title>Evolutionary Information</title>
+          <p>Evolutionary information has often been introduced in functional site predictors in recent
+studies, including RNA-binding site prediction. Previous studies showed that position-specific
+scoring matrix (PSSM) (an important form of evolutionary information) greatly improved the
+performance of RBPs prediction. PSSMs were used widely in pervious prediction studies because
+they provide the likelihood of a particular residue substitution based on evolutionary information.</p>
+        </sec>
+        <sec id="sec-2-2-5">
+          <title>2.2.2. Structure-Based Features</title>
+        </sec>
+        <sec id="sec-2-2-6">
+          <title>The Secondary Structure (SS)</title>
+          <p>
+            The secondary structure (SS) provides local and geometric patterns, which can be obtained in
+two ways: One is that the protein structure is available and real SS could be calculated using SS
+assignment approach such as DSSPcont [
+            <xref ref-type="bibr" rid="ref37 ref38">37,38</xref>
+            ], the other is that the protein structure is unavailable
+and predicted SS could be obtained using SS predicted algorithm such as PSIPRED [
+            <xref ref-type="bibr" rid="ref38 ref39 ref40">38–40</xref>
+            ]. SS has
+been employed as an encoding feature in several studies to predict RNA-binding residues [
+            <xref ref-type="bibr" rid="ref41 ref42">41,42</xref>
+            ].
+          </p>
+        </sec>
+        <sec id="sec-2-2-7">
+          <title>Accessible Surface Area (ASA)</title>
+          <p>
+            RNA-binding residues tend to be exposed and interact with proteins, so calculation of solvent
+accessibility would be helpful in RNA-binding sites prediction. The relative ASA could be calculated
+using NACCESS [
+            <xref ref-type="bibr" rid="ref43 ref44">43,44</xref>
+            ], while the protein structure is available. It is worth pointing out that the
+relative ASA could not be calculated when the DNA molecule was absent. Residues with ASA value
+greater than 5% are defined as surface accessible residues.
+          </p>
+        </sec>
+        <sec id="sec-2-2-8">
+          <title>2.2.3. Chemical and Physical Features</title>
+        </sec>
+        <sec id="sec-2-2-9">
+          <title>Hydrophobicity</title>
+          <p>
+            Hydrophobicity, which represents the proportion of residues repelled by water, is frequently
+used by RNA-binding site predictors. Hydrophobicity scale was defined with numerical value for
+each amino acid [
+            <xref ref-type="bibr" rid="ref45">45</xref>
+            ].
+          </p>
+        </sec>
+        <sec id="sec-2-2-10">
+          <title>Electrostatic Patches</title>
+        </sec>
+        <sec id="sec-2-2-11">
+          <title>Cleft Size</title>
+          <p>
+            A protein surface status can be described by electrostatic patches. Generally, nucleic acid-binding
+interfaces are more likely to be positively charged electrostatic patches [
+            <xref ref-type="bibr" rid="ref46">46</xref>
+            ]. Electrostatic patches can
+be computed using GRASP [
+            <xref ref-type="bibr" rid="ref47">47</xref>
+            ], GRASS [
+            <xref ref-type="bibr" rid="ref48">48</xref>
+            ], or the web server PFplus (PatchFinderPlus; Available
+online: http://pfp.technion.ac.il) [
+            <xref ref-type="bibr" rid="ref49">49</xref>
+            ].
+          </p>
+          <p>
+            Cleft size is an important feature because the largest cleft on a protein surface tends to be where
+the protein active site is located [
+            <xref ref-type="bibr" rid="ref50">50</xref>
+            ]. The charge, dipole, and quadrupole moments can also be used
+to adequately recognize RBPs [
+            <xref ref-type="bibr" rid="ref51">51</xref>
+            ].
+          </p>
+        </sec>
+      </sec>
+      <sec id="sec-2-3">
+        <title>2.3. Prediction Methods</title>
+        <p>The computational methods used in previous studies to identify RBPs or RNA-binding sites can
+be divided into three aspects: (1) the use of sequence-based prediction methods when structure is
+unknown and sequence is known; (2) prediction methods based on structure when the query protein
+structure has been resolved; and (3) modeling using a docking method when the query structure is
+unknown. These three approaches are detailed below.</p>
+        <sec id="sec-2-3-1">
+          <title>2.3.1. Sequences-Based Methods</title>
+          <p>Sequence-Based Methods for RNA-Binding Site Prediction</p>
+          <p>
+            The number of known protein–RNA complex structures is few, so prediction methods which
+use only sequence information play an important role. Previously, Jeong et al. [
+            <xref ref-type="bibr" rid="ref52">52</xref>
+            ] introduced
+a predictor for RNA-binding sites using predicted secondary structure and amino acid type, and
+employingan artificial neural network. Subsequently, Terribilini et al. [
+            <xref ref-type="bibr" rid="ref33">33</xref>
+            ] contributed RNABindR,
+which is a classical method to train naive Bayes (NB) classifiers to predict RNA-binding sites.
+The RB109 dataset is listed in Table 1. Wang and Brown developed the BindN tool, which is a
+predictor of RNA- and DNA-binding sites [
+            <xref ref-type="bibr" rid="ref9">9</xref>
+            ]. The sequence features used in this method include
+molecular mass, hydrophobicity index, and the side chain pKa value. In addition, the evolutionary
+information was added to predictors, especially in the form of PSSMs. Pprint was developed by
+Kumar et al. [
+            <xref ref-type="bibr" rid="ref31">31</xref>
+            ], which combined evolutionary information (PSSM) and support vector machines
+(SVMs) and improved RNA-binding site and residue predictions significantly. Wang et al. [
+            <xref ref-type="bibr" rid="ref53">53</xref>
+            ]
+used SVM and PSSM profiles coupled with predicted SS and PSI-BLAST profiles in the PRINTR
+method to obtain improved performance. Tong et al. [
+            <xref ref-type="bibr" rid="ref54">54</xref>
+            ] introduced RISP, which is a hybrid
+RNA-binding site predictor which uses SVMs in conjunction with PSSMs and achieved a 61.0%
+increase in sensitivity and an 83.3% increase in specificity. A similar method, RNAProB, using
+SVM and a novel smoothed PSSM encoding method, was developed by Cheng et al. [
+            <xref ref-type="bibr" rid="ref55">55</xref>
+            ] and
+it gave better performance than the then current state-of-the-art systems. In 2010, Li et al. [
+            <xref ref-type="bibr" rid="ref56">56</xref>
+            ]
+constructed a novel method, employing evolutionary PSSM and structure-derived features to predict
+RNA-binding residues, which led to significant improvement. Liu et al. [
+            <xref ref-type="bibr" rid="ref30">30</xref>
+            ] proposed a novel
+classification system that combined sequence/structure-based features and interaction propensity,
+which is a novel interacting feature. In addition, a novel machine learning method (random forest)
+was used. Furthermore, Liu et al. compared their method with previous methods (e.g., RNAProB,
+PPRint, BindN and RNABindR) and achieved enhanced performance. Zhang et al. [
+            <xref ref-type="bibr" rid="ref57">57</xref>
+            ] presented an
+RNA-binding residue predictor using solvent accessibility, predicted SS, evolutionary conservation
+and sequence information. RNABindRPlus [
+            <xref ref-type="bibr" rid="ref58">58</xref>
+            ] is a recently developed predictor which obviously
+improved prediction reliability, which combines sequence homology and machine learning methods.
+Recently, Cheng et al. [
+            <xref ref-type="bibr" rid="ref27">27</xref>
+            ] developed a predictor (PRIPU) for protein–RNA interactions; the most
+important difference between this and original methods is that only positive and unlabeled samples
+are used in PRIPU, not negative samples.
+          </p>
+          <p>Sequence-Based Methods for RNA-Binding Proteins (RBPs) Prediction</p>
+          <p>
+            Han et al. [
+            <xref ref-type="bibr" rid="ref36">36</xref>
+            ] explored the SVM machine learning method to predict RBPs directly based on
+their primary sequence. The dataset in this work contained 447 RBPs and 4881 non-RBPs. The
+prediction accuracy was 40.0% and 99.9% for snRBPs and non-snRBPs, respectively, indicating the
+need for a sufficient number of proteins to train the SVMs. Shao et al. [
+            <xref ref-type="bibr" rid="ref59">59</xref>
+            ] developed a predictor
+to predict RNA-binding proteins with SVM methods using sequence characteristics. Similar to
+RNA-binding site prediction, evolutionary information was introduced to improve the performance
+of RBP predictions. Kumar et al. [
+            <xref ref-type="bibr" rid="ref60">60</xref>
+            ] exploited RNApred which combined binding residues and PSSM
+profiles and the SVM method to discriminate RBPs and non-RBPs. Another voting system was used
+to identify RBPs [
+            <xref ref-type="bibr" rid="ref42">42</xref>
+            ]. Zhao et al. developed SPOT for prediction of RBPs using a fold recognition
+method, which is freely available on the internet for academic users (Table 2).
+          </p>
+        </sec>
+        <sec id="sec-2-3-2">
+          <title>2.3.2. Structure-Based Methods</title>
+          <p>Structure-Based Methods for RNA-Binding Site Prediction</p>
+          <p>
+            When the structure of the query protein is available and employed in the prediction system,
+the prediction became more reliable. There are a number of structure-based RNA-binding site
+prediction methods. Kim et al. [
+            <xref ref-type="bibr" rid="ref13">13</xref>
+            ] developed KYG method, which uses sequence profiles, doublets of
+spatially close residues, a number of binding scores, and combinations. Chen and Lim [
+            <xref ref-type="bibr" rid="ref61">61</xref>
+            ] developed
+a predictor based on structure information including electrostatics, evolution, and geometry. The
+disparate cleft and the surface patch were considered to be RNA-binding site. Subsequently,
+PRIP [
+            <xref ref-type="bibr" rid="ref62">62</xref>
+            ] was created, which exploited structural and topological information (retention coefficient,
+betweenness-centrality, accessible surface area and PSI-BLAST profile) and used two machine
+learning methods (SVM and naive Bayes classifiers). Towfic et al. [
+            <xref ref-type="bibr" rid="ref63">63</xref>
+            ] contributed Struct-NB, which
+used structural features to predict RNA-binding sites by combining a naive Bayes classifier. Recently,
+two predictors based on structure were proposed. RBRDetector [
+            <xref ref-type="bibr" rid="ref64">64</xref>
+            ], which uses evolutionary and
+microenvironmental features as inputs, combines feature- and template-based strategies to improve
+predictions of RNA-binding residues. The other predictor compares each template patch with
+surrounding patches and uses the accumulated distances as structural features [
+            <xref ref-type="bibr" rid="ref26">26</xref>
+            ].
+          </p>
+        </sec>
+        <sec id="sec-2-3-3">
+          <title>Structure-Based Methods for RBP Prediction</title>
+          <p>
+            Zhao et al. [
+            <xref ref-type="bibr" rid="ref15">15</xref>
+            ] introduced a predictor for RNA-binding domains based on structure information,
+which combined RNA binding affinity and relative structural similarity. SPOT-Seq-RNA [
+            <xref ref-type="bibr" rid="ref65">65</xref>
+            ] is
+a template-based structure prediction package which integrates RBP, RNA-binding residue, and
+protein–RNA complex structure prediction. RBPs and protein–RNA complexes are often modeled
+using the docking method.
+          </p>
+        </sec>
+        <sec id="sec-2-3-4">
+          <title>2.3.3. Protein–RNA Complex Docking</title>
+          <p>
+            Research on protein 3D structure modeling has become increasingly complex. Modeling
+structures of a protein–RNA complex is very important to help us understand the mechanisms of
+interaction. Several docking techniques used to predict protein–RNA complexes rely on known
+RNA and protein structures. There are no protein–RNA interaction docking algorithms, most
+reported docking techniques are modified from those protein-ligand interaction and protein–protein
+interaction docking softwares by employing certain energy/scoring function that fitted for
+protein–RNA interactions. For example, Katchalski-Katzir et al. [
+            <xref ref-type="bibr" rid="ref19">19</xref>
+            ] developed a low-resolution
+docking program, which requires specific scoring functions for different ligands. In the modeling
+progress, the program performs a six-dimensional search through the rotation of a ligand molecule
+and the rigid body translation and generates decoys. Gabb et al. [
+            <xref ref-type="bibr" rid="ref22">22</xref>
+            ] employed the FTDOCK program,
+which not only accepts protein–protein docking, but also accepts nucleic acid molecules. Ritchie and
+Kemp [
+            <xref ref-type="bibr" rid="ref20">20</xref>
+            ] introduced Hex, which enables protein–nucleic acid and protein–protein docking. The
+decoy scoring method contains electrostatics and shape-matching but does not have a special function
+for protein–RNA complexes. The method of Haddock [
+            <xref ref-type="bibr" rid="ref18">18</xref>
+            ] enables various molecules (e.g., nucleic
+acids, proteins and other small molecules) for docking, which using biochemical and biophysical
+characteristics as inputs. Recently, Tuszynska and Bujnicki [66] developed QUASI-RNP and
+DARS-RNP, which use statistical and quasi-chemical reference states to score protein–RNA decoys.
+          </p>
+        </sec>
+      </sec>
+      <sec id="sec-2-4">
+        <title>2.4. Prediction Algorithms</title>
+        <p>
+          Almost all popular machine learning methods have been used for prediction of RNA-binding
+sites or RBPs. Generally, the machine learning methods obtain satisfactory performance with valid
+sequence- and/or structure-based features participation. The machine learning methods frequently
+used for RNA-binding research include SVMs [
+          <xref ref-type="bibr" rid="ref27">27,67</xref>
+          ], artificial neural networks (ANN) [68], Bayesian
+networks [
+          <xref ref-type="bibr" rid="ref29">29,67</xref>
+          ], and random forest [
+          <xref ref-type="bibr" rid="ref12">12,69</xref>
+          ]. Puton et al. [
+          <xref ref-type="bibr" rid="ref8">8</xref>
+          ] have attempted a meta-predictor of
+RNA-binding residues based on three of the highest ranked sequence-based primary predictors.
+This meta-predictor outperforms most other predictors. The template-based approach is another
+algorithm to predict structure of protein–RNA complex when a template structure is available. This
+method recognizes the putative RBPs by structurally aligning the query protein to RBPs with known
+structures. SPARKS X [
+          <xref ref-type="bibr" rid="ref15">15</xref>
+          ] is a program which predicts structure based on template-based structure.
+Similarly, TIM-align [70] is a structural alignment program.
+        </p>
+      </sec>
+      <sec id="sec-2-5">
+        <title>2.5. Evaluation and Performance of Various Predictors</title>
+        <sec id="sec-2-5-1">
+          <title>2.5.1. Performance Measures</title>
+          <p>The parameters commonly used to assess RNA-binding sites and RBP prediction performance
+include sensitivity, accuracy, strength, specificity, F-measure, precision, the Matthews correlation
+coefficient (MCC), and area under the receiver operating characteristic curve (AUC), these parameters
+are detailed listed in Table 3.</p>
+          <p>For the formula presented in Table 3, TP represents true positives which are correctly predicted
+RNA-binding residues; FP indicates false positives which are mistakenly predicted RNA-binding
+residues; TN denotes true negatives which are correctly predicted non-RNA-binding residues;
+and FN means false negatives which are wrongly predicted non-RNA-binding residues. Due
+to the imbalance between positive sample and negative sample, the MCC is regarded as proper
+measurement to evaluate the overall performance. “MCC = 0” means completely random prediction,
+and “MCC = 1” indicates perfect prediction. Higher value of MCC (between 0 and 1) represents better
+prediction accuracy. Another widely used measurement is the receiver operating characteristic (ROC)
+curve, especially in the comparison of several predictors. The x-axis of ROC curve represents the true
+positive rate and the y-axis denotes the false positive rate. The larger the area under the curve (AUC),
+the better the method.</p>
+        </sec>
+        <sec id="sec-2-5-2">
+          <title>2.5.2. Comparison of Various Prediction Methods</title>
+          <p>
+            The prediction results of existing methods for RNA-binding sites and RBP predictions are
+summarized in Table 4. The accuracy of most predictions is approximately 60%–80% and the
+specificity and sensitivity of these methods range widely. Each method has its own specialty
+because of the various datasets, input features, and algorithms. Three main datasets are listed in
+Table 4 including RB75, RB172, and RB344. Several original studies [
+            <xref ref-type="bibr" rid="ref28 ref8">8,28,71</xref>
+            ] compared several
+predictors independently based on the unified dataset and their results are summarized in this
+manuscript. The MCC is always considered an unbiased measurement and has been calculated
+in most methods, which helps significantly when comparing the performance among these
+methods. Subsequently, a meta-predictor that combines three predictors has been developed and
+has satisfactory performance [
+            <xref ref-type="bibr" rid="ref8">8</xref>
+            ].
+2.5.3. Collection of Web Servers of RBPs and RNA-Binding Site Predictors
+          </p>
+          <p>Many researchers provide web servers when they develop novel methods to predict
+RNA-binding sites and RBPs. Several protein–RNA complex docking programs are also available.
+We collected the URLs which are divided into sequence- and structure-based predictors and docking
+methods (Table 2). We have tested every web server and labeled them with “ ” or “X” if the web
+server is available or not, respectively, and noted if the approach is aimed at predicting binding
+sites or RBPs. Actually, web servers could provide easy-to-use tools to the community. Users could
+understand the algorithm and conveniently obtain prediction results using web servers. Meanwhile,
+developers could continually modify their methods with users’ feedback.</p>
+        </sec>
+      </sec>
+    </sec>
+    <sec id="sec-3">
+      <title>3. Conclusions and Future Perspectives</title>
+      <p>Due to the significant biological roles of several RNA types, RNA-binding site prediction has
+become more and more important in the area of protein functional site prediction. Prediction accuracy
+has improved significantly during the past decades and a number of web servers are available to
+experimental scientists. Nevertheless, the current predictors require further research to improve their
+effectiveness due to shortcomings.</p>
+      <p>Three outstanding issues face efforts to predict RNA-binding sites and RBPs. The first important
+issue is how to distinguish DNA-binding sites from RNA-binding sites. Generally, the prediction
+approaches that use templates are more effective than those using machine learning methods
+for distinguishing RBPs from DNA-binding proteins. Conversely, for those RBPs that could not
+detect successfully using template-based methods, several machine learning methods can detect
+RNA-binding residues. Therefore, combining the strengths of two approaches has the potential to
+obtain better performance of RNA-binding site and RBP prediction. The second important issue is
+that which vectors contribute more and which ones offer less to the mature predictor in machine
+learning methods remains unclear. It is certain that selection of novel and effective features could be
+one of the most important concepts in RBPs and RNA-binding site prediction. The third issue is that
+all existing protein–RNA docking approaches do not take into account conformational changes that
+may occur in the combination process of protein and RNA molecules. The ability to model the 3D
+RNA structure using several RNA folding simulations [72–74] and accommodating those methods to
+refold RNA fragments to simulate protein–RNA interaction and optimize minimum energy would be
+useful [75–79]. Rother et al. [80] successfully combined RNA and protein 3D structures into a unified
+modeling method. Moreover, further comparison studies are required to adequately evaluate the
+advantages and disadvantages of various methods.
+http://admis.fudan.edu.cn/projects/pripu.htm
+http://einstein.cs.iastate.edu/RNABindRPlus/
+http://s.tartaglialab.com/catrapid/omics
+http://tardis.nibio.go.jp/netasa/srcpred
+http://sparks.informatics.iupui.edu
+http://www.cbi.seu.edu.cn/PRBR/
+http://www.imtech.res.in/raghava/rnapred/
+http://pridb.gdcb.iastate.edu/RPISeq/
+http://bioinfo.ggc.org/bindn+/
+http://prediction.bioengr.uic.edu/
+http://bioinformatics.sussex.ac.uk/PIRANHA/
+http://www.sysbio.ac.cn/datatools.asp
+http://mcgill.3322.org/RNA/
+http://grc.seu.edu.cn/RISP
+http://210.42.106.80/printr/
+http://www.imtech.res.in/raghava/pprint/
+http://bindr2.gdcb.iastate.edu/RNABindR/
+http://bioinfo.ggc.org/bindn/
+http://jing.cz3.nus.edu.sg/cgi-bin/svmprot.cgi</p>
+      <p>
+        Cheng et al. (2015) [
+        <xref ref-type="bibr" rid="ref27">27</xref>
+        ]
+Walia et al. (2014) [
+        <xref ref-type="bibr" rid="ref58">58</xref>
+        ]
+Agostini et al. (2013) [81]
+Fernandez et al. (2011) [
+        <xref ref-type="bibr" rid="ref29">29</xref>
+        ]
+Zhao et al. (2011) [
+        <xref ref-type="bibr" rid="ref15">15</xref>
+        ]
+Ma et al. (2011) [
+        <xref ref-type="bibr" rid="ref12">12</xref>
+        ]
+Kumar et al. (2011) [
+        <xref ref-type="bibr" rid="ref60">60</xref>
+        ]
+Muppirala et al. (2011) [82]
+Wang et al. (2010) [
+        <xref ref-type="bibr" rid="ref11">11</xref>
+        ]
+Carson et al. (2010) [81]
+Murakami et al. (2010) [
+        <xref ref-type="bibr" rid="ref10">10</xref>
+        ]
+Liu et al. (2010) [
+        <xref ref-type="bibr" rid="ref56">56</xref>
+        ]
+Li et al. (2010) [
+        <xref ref-type="bibr" rid="ref55">55</xref>
+        ]
+Tong et al. (2008) [
+        <xref ref-type="bibr" rid="ref54">54</xref>
+        ]
+Wang et al. (2008) [
+        <xref ref-type="bibr" rid="ref53">53</xref>
+        ]
+Kumar et al. (2008) [
+        <xref ref-type="bibr" rid="ref52">52</xref>
+        ]
+Terribilini et al. (2007) [
+        <xref ref-type="bibr" rid="ref32">32</xref>
+        ]
+Wang and Brown (2006) [
+        <xref ref-type="bibr" rid="ref9">9</xref>
+        ]
+Han et al. (2004) [
+        <xref ref-type="bibr" rid="ref36">36</xref>
+        ]
+      </p>
+      <p>PRIPU
+RNABindRPlus
+CatRAPID omics
+SRCPred
+SPOT
+PRBR
+RNAPred
+RPISeq
+BindN+
+NAPS
+PiRaNhA
+PRNA
+RNA
+RISP
+PRINTR
+PPRInt
+RNABindR
+BindN
+SVMProt
+RBPDetector
+SPOT-Seq-RNA
+DRNA
+OPRA
+PRIP
+KYG
+DARS-RNP and QUASI-RNP
+PatchDock
+Haddock
+Hex
+FTDock (3D-Dock)
+GRAMM</p>
+      <p>Available</p>
+      <p>Seq/Struc/Docking</p>
+      <p>Sites/Protein
+X
+X
+X
+X
+X
+X
+X
+X
+X
+X
+X
+seq
+struc
+docking
+site
+site
+site
+site
+protein</p>
+      <p>site
+protein
+site
+site
+site
+site
+site
+site
+site
+site
+site
+site
+site
+protein</p>
+      <p>site
+protein
+protein
+site
+site
+protein
+complex
+complex
+complex
+complex
+complex
+complex
+http://ibi.hzau.edu.cn/rbrdetector
+http://sparks-lab.org/server/SPOT-Seq-RNA/
+http://sparks.informatics.iupui.edu/yueyang/DFIRE/dRdR-DB-service
+Program available upon request from the authors
+http://www.qfab.org/PRIP
+http://cib.cf.ocha.ac.jp/KYG/
+http://www.genesilico.pl/RNP/
+http://bioinfo3d.cs.tau.ac.il/PatchDock/index.html
+http://www.nmr.chem.uu.nl/haddock/;
+http://haddock.science.uu.nl/services/HADDOCK
+http://hex.loria.fr/; http://hexserver.loria.fr/
+http://www.sbg.bio.ic.ac.uk/docking/
+http://vakser.bioinformatics.ku.edu/main/resources_gramm1.03.php</p>
+      <p>
+        Yang et al. (2014) [
+        <xref ref-type="bibr" rid="ref64">64</xref>
+        ]
+Yang et al. (2014) [
+        <xref ref-type="bibr" rid="ref65">65</xref>
+        ]
+Zhao et al. (2011) [
+        <xref ref-type="bibr" rid="ref15">15</xref>
+        ]
+Perez-Cano and Fernandez-Recio (2010) [
+        <xref ref-type="bibr" rid="ref14">14</xref>
+        ]
+Maetschke et al. (2009) [
+        <xref ref-type="bibr" rid="ref62">62</xref>
+        ]
+Kim et al. (2006) [
+        <xref ref-type="bibr" rid="ref13">13</xref>
+        ]
+Tuszynska and Bujnicki (2011) [66]
+Schneidman-Duhovny et al. (2005) [
+        <xref ref-type="bibr" rid="ref21">21</xref>
+        ]
+Dominguez et al. (2003) [
+        <xref ref-type="bibr" rid="ref18">18</xref>
+        ]
+Ritchie and Kemp (2000) [
+        <xref ref-type="bibr" rid="ref20">20</xref>
+        ]
+Gabb et al. (1997) [
+        <xref ref-type="bibr" rid="ref22">22</xref>
+        ]
+      </p>
+      <p>
+        Katchalski-Katzir et al. (1992) [
+        <xref ref-type="bibr" rid="ref19">19</xref>
+        ]
+: denotes the URL is available now; X: means the URL is not available nowadays; URLs: Abbreviations of UniformResourceLocators.
+a TP = True positive number; TN = True negative number; FP = False positive number; FN = False negative number; b In AUC formulation, i takes on values from 1 to n, T is the
+total number of positives in the test set, and Ti is the number of positives that score higher than the ith highest scoring negative.
+      </p>
+    </sec>
+    <sec id="sec-4">
+      <title>Methods</title>
+      <sec id="sec-4-1">
+        <title>PiRaNhA</title>
+      </sec>
+      <sec id="sec-4-2">
+        <title>PPRInt</title>
+      </sec>
+      <sec id="sec-4-3">
+        <title>BindN</title>
+      </sec>
+      <sec id="sec-4-4">
+        <title>BindN+</title>
+      </sec>
+      <sec id="sec-4-5">
+        <title>RNABindR RNABindR v2.0 PRBR NAPS</title>
+        <p>RNAProB</p>
+        <p>KYG *
+DRNA *</p>
+        <p>OPRA *</p>
+        <p>Ren’s method
+Meta-predictor b</p>
+        <p>RB75
+RB75
+RB172
+RB344
+RB75
+RB172
+RB75
+RB172
+RB344
+RB75
+RB172
+RB75
+RB75
+RB172
+RB172
+RB75
+RB75
+RB344
+RB75
+RB344
+RB75
+a N/A—not available; MCC—Matthews Correlation Coefficient; AUC—area under curve; SEN—sensitivity; SPE—specificity; b Meta-predictor developed based on top three
+sequence-based methods according to authors benchmark (PiRaNhA, PPRInt and BindN+); * The meta-predictor is composed of those methods labeled with asterisk.
+Acknowledgments: This work was supported by Grant No. 31401138 from the National Natural Science
+Foundation of China (to Jingna Si), Fundamental Research Funds for the Central Universities (TD2012-04), the
+Beijing Forestry University Young Scientist Fund (No. BLX2011007), the Open Fund of the State Key Laboratory
+of Tree Genetics and Breeding (Northeast Forestry University) (No. K2013201), and Graduate Training and
+Development Program of Beijing Municipal Commission of Education (BLCXY201515). The English in this
+document has been checked by at least two professional editors, both native speakers of English. For a certificate,
+can be available online: http://www.textcheck.com/certificate/VAiz2L.</p>
+        <p>Author Contributions: Jingna Si designed the study, performed the literature mining, and drafted the
+manuscript; Jing Cui, Jin Cheng and Rongling Wu read and revised the manuscript. All authors approved
+the final manuscript.</p>
+      </sec>
+      <sec id="sec-4-6">
+        <title>Conflicts of Interest: The authors declare no conflict of interest.</title>
+        <p>66. Tuszynska, I.; Bujnicki, J.M. DARS-RNP and QUASI-RNP: New statistical potentials for protein-RNA
+docking. BMC Bioinform. 2011, 12. [CrossRef] [PubMed]
+67. Choi, S.; Han, K. Prediction of RNA-binding amino acids from protein and RNA sequences. BMC Bioinform.</p>
+        <p>2011, 12 (Suppl. S13). [CrossRef] [PubMed]
+68. Walia, R.R.; Caragea, C.; Lewis, B.A.; Towfic, F.; Terribilini, M.; El-Manzalawy, Y.; Dobbs, D.; Honavar, V.</p>
+        <p>Protein-RNA interface residue prediction using machine learning: An assessment of the state of the art.</p>
+        <p>BMC Bioinform. 2012, 13. [CrossRef] [PubMed]
+69. Pan, X.; Zhu, L.; Fan, Y.X.; Yan, J. Predicting protein–RNA interaction amino acids using random forest
+based on submodularity subset selection. Comput. Biol. Chem. 2014, 53, 324–330. [CrossRef] [PubMed]
+70. Zhang, Y.; Skolnick, J. TM-align: A protein structure alignment algorithm based on the TM-score. Nucleic</p>
+        <p>Acids Res. 2005, 33, 2302–2309. [CrossRef] [PubMed]
+71. Zhao, H.; Yang, Y.; Zhou, Y. Prediction of RNA binding proteins comes of age from low resolution to high
+resolution. Mol. Biosyst. 2013, 9, 2417–2425. [CrossRef] [PubMed]
+72. Denesyuk, N.A.; Thirumalai, D. Coarse-grained model for predicting RNA folding thermodynamics.</p>
+        <p>J. Phys. Chem. B 2013, 117, 4901–4911. [CrossRef] [PubMed]
+73. Ding, F.; Sharma, S.; Chalasani, P.; Demidov, V.V.; Broude, N.E.; Dokholyan, N.V. Ab initio RNA folding by
+discrete molecular dynamics: From structure prediction to folding mechanisms. RNA 2008, 14, 1164–1173.
+[CrossRef] [PubMed]
+74. Das, R.; Baker, D. Automated de novo prediction of native-like RNA tertiary structures. Proc. Natl. Acad.</p>
+        <p>Sci. USA 2007, 104, 14664–14669. [CrossRef] [PubMed]
+75. Chan, D.S.; Lee, H.M.; Yang, F.; Che, C.M.; Wong, C.C.; Abagyan, R.; Leung, C.H.; Ma, D.L. Structure-based
+discovery of natural-product-like TNF- inhibitors. Angew. Chem. Int. Ed. Engl. 2010, 49, 2860–2864.
+[CrossRef] [PubMed]
+76. Leung, C.H.; Zhong, H.J.; Yang, H.; Cheng, Z.; Chan, D.S.; Ma, V.P.; Abagyan, R.; Wong, C.Y.; Ma, D.L.</p>
+        <p>A metal-based inhibitor of tumor necrosis factor- . Angew. Chem. Int. Ed. Engl. 2012, 51, 9010–9014.
+[CrossRef] [PubMed]
+77. Ma, D.L.; Lin, S.; Leung, K.H.; Zhong, H.J.; Liu, L.J.; Chan, D.S.; Bourdoncle, A.; Mergny, J.L.; Wang, H.M.;
+Leung, C.H. An oligonucleotide-based label-free luminescent switch-on probe for RNA detection utilizing
+a G-quadruplex-selective iridium(III) complex. Nanoscale 2014, 6, 8489–8494. [CrossRef] [PubMed]
+78. Ma, D.L.; Liu, L.J.; Leung, K.H.; Chen, Y.T.; Zhong, H.J.; Chan, D.S.; Wang, H.M.; Leung, C.H. Antagonizing
+STAT3 dimerization with a rhodium(III) complex. Angew. Chem. Int. Ed. Engl. 2014, 53, 9178–9182.
+[CrossRef] [PubMed]
+79. Zhong, H.J.; Lu, L.; Leung, K.H.; Wong, C.C.L.; Peng, C.; Yan, S.C.; Leung, C.H. An iridium(III)-based
+irreversible protein–protein interaction inhibitor of BRD4 as a potent anticancer agent. Chem. Sci. 2015, 6,
+5400–5408. [CrossRef]
+80. Rother, K.; Rother, M.; Boniecki, M.; Puton, T.; Bujnicki, J.M. RNA and protein 3D structure modeling:</p>
+        <p>Similarities and differences. J. Mol. Model. 2011, 17, 2325–2336. [CrossRef] [PubMed]
+81. Agostini, F.; Zanzoni, A.; Klus, P.; Marchese, D.; Cirillo, D.; Tartaglia, G.G. catRAPID omics: A web
+server for large-scale prediction of protein-RNA interactions. Bioinformatics 2013, 29, 2928–2930. [CrossRef]
+[PubMed]
+82. Muppirala, U.K.; Honavar, V.G.; Dobbs, D. Predicting RNA-protein interactions using only sequence
+information. BMC Bioinform. 2011, 12. [CrossRef] [PubMed]
+83. Carson, M.B.; Langlois, R.; Lu, H. NAPS: A residue-level nucleic acid-binding prediction server.</p>
+        <p>Nucleic Acids Res. 2010, 38, W431–W455. [CrossRef] [PubMed]
+© 2015 by the authors; licensee MDPI, Basel, Switzerland. This article is an open
+access article distributed under the terms and conditions of the Creative Commons by
+Attribution (CC-BY) license (http://creativecommons.org/licenses/by/4.0/).</p>
+      </sec>
+    </sec>
+  </body>
+  <back>
+    <ref-list>
+      <ref id="ref1">
+        <mixed-citation>
+          1.
+          <string-name>
+            <given-names>Jacobs</given-names>
+            <surname>Anderson</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>J.S.</surname>
+          </string-name>
+          ; Parker,
+          <string-name>
+            <surname>R.</surname>
+          </string-name>
+          <article-title>Computational identification of cis-acting elements affecting post-transcriptional control of gene expression in Saccharomyces cerevisiae</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2000</year>
+          ,
+          <volume>28</volume>
+          ,
+          <fpage>1604</fpage>
+          -
+          <lpage>1617</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref2">
+        <mixed-citation>
+          2.
+          <string-name>
+            <surname>Abdelmohsen</surname>
+            ,
+            <given-names>K.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Kuwano</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Kim</surname>
+            ,
+            <given-names>H.H.</given-names>
+          </string-name>
+          ; Gorospe,
+          <string-name>
+            <surname>M.</surname>
+          </string-name>
+          <article-title>Posttranscriptional gene regulation by RNA-binding proteins during oxidative stress: Implications for cellular senescence</article-title>
+          .
+          <source>Biol. Chem</source>
+          .
+          <year>2008</year>
+          ,
+          <volume>389</volume>
+          ,
+          <fpage>243</fpage>
+          -
+          <lpage>255</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref3">
+        <mixed-citation>
+          3.
+          <string-name>
+            <surname>Saunus</surname>
+            ,
+            <given-names>J.M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>French</surname>
+            ,
+            <given-names>J.D.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Edwards</surname>
+            ,
+            <given-names>S.L.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Beveridge</surname>
+            ,
+            <given-names>D.J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Hatchell</surname>
+            ,
+            <given-names>E.C.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Wagner</surname>
+            ,
+            <given-names>S.A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Stein</surname>
+            ,
+            <given-names>S.R.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Davidson</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Simpson</surname>
+            ,
+            <given-names>K.J.</given-names>
+          </string-name>
+          ; Francis, G.D.; et al.
+          <article-title>Posttranscriptional regulation of the breast cancer susceptibility gene BRCA1 by the RNA binding protein HuR</article-title>
+          .
+          <source>Cancer Res</source>
+          .
+          <year>2008</year>
+          ,
+          <volume>68</volume>
+          ,
+          <fpage>9469</fpage>
+          -
+          <lpage>9478</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref4">
+        <mixed-citation>
+          4.
+          <string-name>
+            <surname>Noller</surname>
+            ,
+            <given-names>H.F.</given-names>
+          </string-name>
+          <article-title>RNA structure: Reading the ribosome</article-title>
+          .
+          <source>Science</source>
+          <year>2005</year>
+          ,
+          <volume>309</volume>
+          ,
+          <fpage>1508</fpage>
+          -
+          <lpage>1514</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref5">
+        <mixed-citation>
+          5.
+          <string-name>
+            <surname>Orengo</surname>
+            ,
+            <given-names>C.A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Michie</surname>
+            ,
+            <given-names>A.D.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Jones</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Jones</surname>
+            ,
+            <given-names>D.T.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Swindells</surname>
+            ,
+            <given-names>M.B.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Thornton</surname>
+            ,
+            <given-names>J.M.</given-names>
+          </string-name>
+          <article-title>CATH-A hierarchic classification of protein domain structures</article-title>
+          .
+          <source>Structure</source>
+          <year>1997</year>
+          ,
+          <volume>5</volume>
+          ,
+          <fpage>1093</fpage>
+          -
+          <lpage>1108</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref6">
+        <mixed-citation>
+          6.
+          <string-name>
+            <surname>Ponting</surname>
+            ,
+            <given-names>C.P.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Schultz</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Milpetz</surname>
+            ,
+            <given-names>F.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Bork</surname>
+            ,
+            <given-names>P.</given-names>
+          </string-name>
+          <article-title>SMART: Identification and annotation of domains from signalling and extracellular protein sequences</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>1999</year>
+          ,
+          <volume>27</volume>
+          ,
+          <fpage>229</fpage>
+          -
+          <lpage>232</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref7">
+        <mixed-citation>
+          7.
+          <string-name>
+            <surname>Berman</surname>
+            ,
+            <given-names>H.M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Westbrook</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Feng</surname>
+            ,
+            <given-names>Z.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Gilliland</surname>
+            ,
+            <given-names>G.</given-names>
+          </string-name>
+          ; Bhat,
+          <string-name>
+            <given-names>T.N.</given-names>
+            ;
+            <surname>Weissig</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>H.</given-names>
+            ;
+            <surname>Shindyalov</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>I.N.</given-names>
+            ;
+            <surname>Bourne</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>P.E.</surname>
+          </string-name>
+          <article-title>The Protein Data Bank</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2000</year>
+          ,
+          <volume>28</volume>
+          ,
+          <fpage>235</fpage>
+          -
+          <lpage>242</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref8">
+        <mixed-citation>
+          8.
+          <string-name>
+            <surname>Puton</surname>
+            ,
+            <given-names>T.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Kozlowski</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Tuszynska</surname>
+            ,
+            <given-names>I.</given-names>
+          </string-name>
+          ; Rother,
+          <string-name>
+            <given-names>K.</given-names>
+            ;
+            <surname>Bujnicki</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>J.M.</surname>
+          </string-name>
+          <article-title>Computational methods for prediction of protein-RNA interactions</article-title>
+          .
+          <source>J. Struct. Biol</source>
+          .
+          <year>2012</year>
+          ,
+          <volume>179</volume>
+          ,
+          <fpage>261</fpage>
+          -
+          <lpage>268</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref9">
+        <mixed-citation>
+          9.
+          <string-name>
+            <surname>Wang</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Brown</surname>
+            ,
+            <given-names>S.J.</given-names>
+          </string-name>
+          <article-title>BindN: A web-based tool for efficient prediction of DNA and RNA binding sites in amino acid sequences</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2006</year>
+          ,
+          <volume>34</volume>
+          ,
+          <fpage>W243</fpage>
+          -
+          <lpage>W248</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref10">
+        <mixed-citation>
+          10.
+          <string-name>
+            <surname>Murakami</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Spriggs</surname>
+            ,
+            <given-names>R.V.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Nakamura</surname>
+            , H.; Jones,
+            <given-names>S.</given-names>
+          </string-name>
+          <article-title>PiRaNhA: A server for the computational prediction of RNA-binding residues in protein sequences</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2010</year>
+          ,
+          <volume>38</volume>
+          ,
+          <fpage>W412</fpage>
+          -
+          <lpage>W416</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref11">
+        <mixed-citation>
+          11.
+          <string-name>
+            <surname>Wang</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Huang</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Yang</surname>
+            ,
+            <given-names>M.Q.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Yang</surname>
+            ,
+            <given-names>J.Y.</given-names>
+          </string-name>
+          <article-title>BindN+ for accurate prediction of DNA and RNA-binding residues from protein sequence features</article-title>
+          .
+          <source>BMC Syst. Biol</source>
+          .
+          <year>2010</year>
+          ,
+          <volume>4</volume>
+          (
+          <issue>Suppl</issue>
+          .
+          <year>S1</year>
+          ). [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref12">
+        <mixed-citation>
+          12.
+          <string-name>
+            <surname>Ma</surname>
+          </string-name>
+          , X.;
+          <string-name>
+            <surname>Guo</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Wu</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ; Liu,
+          <string-name>
+            <given-names>H.</given-names>
+            ;
+            <surname>Yu</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>J.</given-names>
+            ;
+            <surname>Xie</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>J.</given-names>
+            ;
+            <surname>Sun</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>X.</surname>
+          </string-name>
+          <article-title>Prediction of RNA-binding residues in proteins from primary sequence using an enriched random forest model with a novel hybrid feature</article-title>
+          .
+          <source>Proteins</source>
+          <year>2011</year>
+          ,
+          <volume>79</volume>
+          ,
+          <fpage>1230</fpage>
+          -
+          <lpage>1239</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref13">
+        <mixed-citation>
+          13.
+          <string-name>
+            <surname>Kim</surname>
+            ,
+            <given-names>O.T.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Yura</surname>
+            ,
+            <given-names>K.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Go</surname>
+            ,
+            <given-names>N.</given-names>
+          </string-name>
+          <article-title>Amino acid residue doublet propensity in the protein-RNA interface and its application to RNA interface prediction</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2006</year>
+          ,
+          <volume>34</volume>
+          ,
+          <fpage>6450</fpage>
+          -
+          <lpage>6460</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref14">
+        <mixed-citation>
+          14.
+          <string-name>
+            <surname>Perez-Cano</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Solernou</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Pons</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Fernández-Recio</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          <article-title>Structural prediction of protein-RNA interaction by computational docking with propensity-based statistical potentials</article-title>
+          .
+          <source>Pac. Symp. Biocomput</source>
+          .
+          <year>2010</year>
+          ,
+          <year>2010</year>
+          ,
+          <fpage>293</fpage>
+          -
+          <lpage>301</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref15">
+        <mixed-citation>
+          15.
+          <string-name>
+            <surname>Zhao</surname>
+            ,
+            <given-names>H.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Yang</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Zhou</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          <article-title>Structure-based prediction of RNA-binding domains and RNA-binding sites and application to structural genomics targets</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2011</year>
+          ,
+          <volume>39</volume>
+          ,
+          <fpage>3017</fpage>
+          -
+          <lpage>3025</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref16">
+        <mixed-citation>
+          16.
+          <string-name>
+            <surname>Moreira</surname>
+            ,
+            <given-names>I.S.</given-names>
+          </string-name>
+          ; Fernandes,
+          <string-name>
+            <given-names>P.A.</given-names>
+            ;
+            <surname>Ramos</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>M.J.</surname>
+          </string-name>
+          <article-title>Protein-protein docking dealing with the unknown</article-title>
+          .
+          <source>J. Comput. Chem</source>
+          .
+          <year>2010</year>
+          ,
+          <volume>31</volume>
+          ,
+          <fpage>317</fpage>
+          -
+          <lpage>342</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref17">
+        <mixed-citation>
+          17.
+          <string-name>
+            <surname>Tuszynska</surname>
+            ,
+            <given-names>I.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Matelska</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ; Magnus,
+          <string-name>
+            <given-names>M.</given-names>
+            ;
+            <surname>Chojnowski</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>G.</given-names>
+            ;
+            <surname>Kasprzak</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>J.M.</given-names>
+            ;
+            <surname>Kozlowski</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>L.P.</given-names>
+            ;
+            <surname>Dunin-Horkawicz</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>S.</given-names>
+            ;
+            <surname>Bujnicki</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>J.M.</surname>
+          </string-name>
+          <article-title>Computational modeling of protein-RNA complex structures</article-title>
+          .
+          <source>Methods</source>
+          <year>2014</year>
+          ,
+          <volume>65</volume>
+          ,
+          <fpage>310</fpage>
+          -
+          <lpage>319</lpage>
+          . [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref18">
+        <mixed-citation>
+          18.
+          <string-name>
+            <surname>Dominguez</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Boelens</surname>
+            ,
+            <given-names>R.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Bonvin</surname>
+            ,
+            <given-names>A.M.</given-names>
+          </string-name>
+          <string-name>
+            <surname>HADDOCK</surname>
+          </string-name>
+          :
+          <article-title>A protein-protein docking approach based on biochemical or biophysical information</article-title>
+          .
+          <source>J. Am. Chem. Soc</source>
+          .
+          <year>2003</year>
+          ,
+          <volume>125</volume>
+          ,
+          <fpage>1731</fpage>
+          -
+          <lpage>1737</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref19">
+        <mixed-citation>
+          19.
+          <string-name>
+            <surname>Katchalski-Katzir</surname>
+            ,
+            <given-names>E.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Shariv</surname>
+            ,
+            <given-names>I.</given-names>
+          </string-name>
+          ; Eisenstein,
+          <string-name>
+            <given-names>M.</given-names>
+            ;
+            <surname>Friesem</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>A.A.</given-names>
+            ;
+            <surname>Aflalo</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>C.</given-names>
+            ;
+            <surname>Vakser</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>I.A.</surname>
+          </string-name>
+          <article-title>Molecular surface recognition: Determination of geometric fit between proteins and their ligands by correlation techniques</article-title>
+          .
+          <source>Proc. Natl. Acad. Sci. USA</source>
+          <year>1992</year>
+          ,
+          <volume>89</volume>
+          ,
+          <fpage>2195</fpage>
+          -
+          <lpage>2199</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref20">
+        <mixed-citation>
+          20.
+          <string-name>
+            <surname>Ritchie</surname>
+            ,
+            <given-names>D.W.</given-names>
+          </string-name>
+          ; Kemp,
+          <string-name>
+            <surname>G.J.</surname>
+          </string-name>
+          <article-title>Protein docking using spherical polar Fourier correlations</article-title>
+          .
+          <source>Proteins</source>
+          <year>2000</year>
+          ,
+          <volume>39</volume>
+          ,
+          <fpage>178</fpage>
+          -
+          <lpage>194</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref21">
+        <mixed-citation>
+          21.
+          <string-name>
+            <surname>Schneidman-Duhovny</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ; Inbar,
+          <string-name>
+            <given-names>Y.</given-names>
+            ;
+            <surname>Nussinov</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>R.</surname>
+          </string-name>
+          ; Wolfson,
+          <string-name>
+            <surname>H.J.</surname>
+          </string-name>
+          <article-title>PatchDock and SymmDock: Servers for rigid and symmetric docking</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2005</year>
+          ,
+          <volume>33</volume>
+          ,
+          <fpage>W363</fpage>
+          -
+          <lpage>W367</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref22">
+        <mixed-citation>
+          22.
+          <string-name>
+            <surname>Gabb</surname>
+            ,
+            <given-names>H.A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Jackson</surname>
+            ,
+            <given-names>R.M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Sternberg</surname>
+            ,
+            <given-names>M.J.</given-names>
+          </string-name>
+          <article-title>Modelling protein docking using shape complementarity, electrostatics and biochemical information</article-title>
+          .
+          <source>J. Mol. Biol</source>
+          .
+          <year>1997</year>
+          ,
+          <volume>272</volume>
+          ,
+          <fpage>106</fpage>
+          -
+          <lpage>120</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref23">
+        <mixed-citation>
+          23.
+          <string-name>
+            <surname>Si</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Zhao</surname>
+            ,
+            <given-names>R.</given-names>
+          </string-name>
+          ; Wu,
+          <string-name>
+            <surname>R.</surname>
+          </string-name>
+          <article-title>An overview of the prediction of protein DNA-binding sites</article-title>
+          .
+          <source>Int. J. Mol. Sci</source>
+          .
+          <year>2015</year>
+          ,
+          <volume>16</volume>
+          ,
+          <fpage>5194</fpage>
+          -
+          <lpage>5215</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref24">
+        <mixed-citation>
+          24.
+          <string-name>
+            <surname>Wichadakul</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>McDermott</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ; Samudrala,
+          <string-name>
+            <surname>R.</surname>
+          </string-name>
+          <article-title>Prediction and integration of regulatory and protein-protein interactions</article-title>
+          .
+          <source>Methods Mol. Biol</source>
+          .
+          <year>2009</year>
+          ,
+          <volume>541</volume>
+          ,
+          <fpage>101</fpage>
+          -
+          <lpage>143</lpage>
+          . [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref25">
+        <mixed-citation>
+          25.
+          <string-name>
+            <surname>Lewis</surname>
+            ,
+            <given-names>B.A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Walia</surname>
+            ,
+            <given-names>R.R.</given-names>
+          </string-name>
+          ; Terribilini,
+          <string-name>
+            <given-names>M.</given-names>
+            ;
+            <surname>Ferguson</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>J.</surname>
+          </string-name>
+          ; Zheng,
+          <string-name>
+            <given-names>C.</given-names>
+            ;
+            <surname>Honavar</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>V.</given-names>
+            ;
+            <surname>Dobbs</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>D.S. PRIDB</surname>
+          </string-name>
+          :
+          <article-title>A Protein-RNA interface database</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2011</year>
+          ,
+          <volume>39</volume>
+          ,
+          <fpage>D277</fpage>
+          -
+          <lpage>D282</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref26">
+        <mixed-citation>
+          26.
+          <string-name>
+            <surname>Ren</surname>
+            , H.; Shen,
+            <given-names>Y.</given-names>
+          </string-name>
+          <article-title>RNA-binding residues prediction using structural features</article-title>
+          .
+          <source>BMC Bioinform</source>
+          .
+          <year>2015</year>
+          ,
+          <volume>16</volume>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref27">
+        <mixed-citation>
+          27. Cheng,
+          <string-name>
+            <given-names>Z.</given-names>
+            ;
+            <surname>Zhou</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>S.</given-names>
+            ;
+            <surname>Guan</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>J.</surname>
+          </string-name>
+          <article-title>Computationally predicting protein-RNA interactions using only positive and unlabeled examples</article-title>
+          .
+          <source>J. Bioinf. Comput. Biol</source>
+          .
+          <year>2015</year>
+          ,
+          <volume>13</volume>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref28">
+        <mixed-citation>
+          28.
+          <string-name>
+            <surname>Nagarajan</surname>
+            , R.; Gromiha,
+            <given-names>M.</given-names>
+          </string-name>
+          <article-title>M. Prediction of RNA binding residues: An extensive analysis based on structure and function to select the best predictor</article-title>
+          .
+          <source>PLoS ONE</source>
+          <year>2014</year>
+          ,
+          <volume>9</volume>
+          ,
+          <fpage>e91140</fpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref29">
+        <mixed-citation>
+          29.
+          <string-name>
+            <surname>Fernandez</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Kumagai</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Standley</surname>
+            ,
+            <given-names>D.M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Sarai</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Mizuguchi</surname>
+            ,
+            <given-names>K.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Ahmad</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          <article-title>Prediction of dinucleotide-specific RNA-binding sites in proteins</article-title>
+          .
+          <source>BMC Bioinform</source>
+          .
+          <year>2011</year>
+          ,
+          <volume>12</volume>
+          (
+          <issue>Suppl</issue>
+          .
+          <year>S13</year>
+          ). [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref30">
+        <mixed-citation>
+          30. Cheng, C.-W.;
+          <string-name>
+            <surname>Su</surname>
+          </string-name>
+          , E.C.-Y.;
+          <string-name>
+            <surname>Hwang</surname>
+          </string-name>
+          , J.-K.;
+          <string-name>
+            <surname>Sung</surname>
+          </string-name>
+          , T.-Y.;
+          <string-name>
+            <surname>Hsu</surname>
+          </string-name>
+          , W.-L.
+          <article-title>Predicting RNA-binding sites of proteins using support vector machines and evolutionary information</article-title>
+          .
+          <source>BMC Bioinform</source>
+          .
+          <year>2008</year>
+          ,
+          <volume>9</volume>
+          (
+          <issue>Suppl</issue>
+          .
+          <year>S12</year>
+          ). [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref31">
+        <mixed-citation>
+          31.
+          <string-name>
+            <surname>Ahmad</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Sarai</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          <article-title>Analysis of electric moments of RNA-binding proteins: Implications for mechanism and prediction</article-title>
+          .
+          <source>BMC Struct. Biol</source>
+          .
+          <year>2011</year>
+          ,
+          <volume>11</volume>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref32">
+        <mixed-citation>
+          32.
+          <string-name>
+            <surname>Terribilini</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Sander</surname>
+            ,
+            <given-names>J.D.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Lee</surname>
+            ,
+            <given-names>J.H.</given-names>
+          </string-name>
+          ; Zaback,
+          <string-name>
+            <given-names>P.</given-names>
+            ;
+            <surname>Jernigan</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>R.L.</given-names>
+            ;
+            <surname>Honavar</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>V.</given-names>
+            ;
+            <surname>Dobbs</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>D.</surname>
+          </string-name>
+          <article-title>RNABindR: A server for analyzing and predicting RNA-binding sites in proteins</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2007</year>
+          ,
+          <volume>35</volume>
+          ,
+          <fpage>W578</fpage>
+          -
+          <lpage>W584</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref33">
+        <mixed-citation>
+          33.
+          <string-name>
+            <surname>Petrey</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Honig</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          <article-title>GRASP2: Visualization, surface properties, and electrostatics of macromolecular structures and sequences</article-title>
+          .
+          <source>Methods Enzymol</source>
+          .
+          <year>2003</year>
+          ,
+          <volume>374</volume>
+          ,
+          <fpage>492</fpage>
+          -
+          <lpage>509</lpage>
+          . [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref34">
+        <mixed-citation>
+          34.
+          <string-name>
+            <surname>Si</surname>
+            , J.; Zhang,
+            <given-names>Z.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Lin</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Schroeder</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Huang</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          <article-title>MetaDBSite: A meta approach to improve protein DNA-binding sites prediction</article-title>
+          .
+          <source>BMC Syst. Biol</source>
+          .
+          <year>2011</year>
+          ,
+          <volume>5</volume>
+          (
+          <issue>Suppl</issue>
+          .
+          <year>S1</year>
+          ). [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref35">
+        <mixed-citation>
+          35.
+          <string-name>
+            <surname>Bartlett</surname>
+            ,
+            <given-names>G.J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Porter</surname>
+            ,
+            <given-names>C.T.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Borkakoti</surname>
+            ,
+            <given-names>N.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Thornton</surname>
+            ,
+            <given-names>J.M.</given-names>
+          </string-name>
+          <article-title>Analysis of catalytic residues in enzyme active sites</article-title>
+          .
+          <source>J. Mol. Biol</source>
+          .
+          <year>2002</year>
+          ,
+          <volume>324</volume>
+          ,
+          <fpage>105</fpage>
+          -
+          <lpage>121</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref36">
+        <mixed-citation>
+          36.
+          <string-name>
+            <surname>Han</surname>
+          </string-name>
+          , L.Y.;
+          <string-name>
+            <surname>Cai</surname>
+            ,
+            <given-names>C.Z.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Lo</surname>
+            ,
+            <given-names>S.L.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Chung</surname>
+            ,
+            <given-names>M.C.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Chen</surname>
+            ,
+            <given-names>Y.Z.</given-names>
+          </string-name>
+          <article-title>Prediction of RNA-binding proteins from primary sequence by a support vector machine approach</article-title>
+          .
+          <source>RNA</source>
+          <year>2004</year>
+          ,
+          <volume>10</volume>
+          ,
+          <fpage>355</fpage>
+          -
+          <lpage>368</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref37">
+        <mixed-citation>
+          37.
+          <string-name>
+            <surname>Kabsch</surname>
+            , W.; Sander,
+            <given-names>C.</given-names>
+          </string-name>
+          <article-title>Dictionary of protein secondary structure: Pattern recognition of hydrogen-bonded and geometrical features</article-title>
+          .
+          <source>Biopolymers</source>
+          <year>1983</year>
+          ,
+          <volume>22</volume>
+          ,
+          <fpage>2577</fpage>
+          -
+          <lpage>2637</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref38">
+        <mixed-citation>
+          38.
+          <string-name>
+            <surname>Carter</surname>
+            ,
+            <given-names>P.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Andersen</surname>
+            ,
+            <given-names>C.A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Rost</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          <article-title>DSSPcont: Continuous secondary structure assignments for proteins</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2003</year>
+          ,
+          <volume>31</volume>
+          ,
+          <fpage>3293</fpage>
+          -
+          <lpage>3295</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref39">
+        <mixed-citation>
+          39.
+          <string-name>
+            <surname>Si</surname>
+            ,
+            <given-names>J.N.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Yan</surname>
+            ,
+            <given-names>R.X.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Wang</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Zhang</surname>
+            ,
+            <given-names>Z.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Su</surname>
+            ,
+            <given-names>X.D.</given-names>
+          </string-name>
+          <string-name>
+            <surname>TIM-Finder</surname>
+          </string-name>
+          :
+          <article-title>A new method for identifying TIM-barrel proteins</article-title>
+          .
+          <source>BMC Struct. Biol</source>
+          .
+          <year>2009</year>
+          ,
+          <volume>9</volume>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref40">
+        <mixed-citation>
+          40.
+          <string-name>
+            <surname>Karypis</surname>
+            ,
+            <given-names>G.</given-names>
+          </string-name>
+          <article-title>YASSPP: Better kernels and coding schemes lead to improvements in protein secondary structure prediction</article-title>
+          .
+          <source>Proteins</source>
+          <year>2006</year>
+          ,
+          <volume>64</volume>
+          ,
+          <fpage>575</fpage>
+          -
+          <lpage>586</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref41">
+        <mixed-citation>
+          41.
+          <string-name>
+            <surname>Jones</surname>
+            ,
+            <given-names>D.T.</given-names>
+          </string-name>
+          <article-title>Protein secondary structure prediction based on position-specific scoring matrices</article-title>
+          .
+          <source>J. Mol. Biol</source>
+          .
+          <year>1999</year>
+          ,
+          <volume>292</volume>
+          ,
+          <fpage>195</fpage>
+          -
+          <lpage>202</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref42">
+        <mixed-citation>
+          42.
+          <string-name>
+            <surname>Peng</surname>
+            ,
+            <given-names>C.R.</given-names>
+          </string-name>
+          ; Liu,
+          <string-name>
+            <given-names>L.</given-names>
+            ;
+            <surname>Niu</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>B.</given-names>
+            ;
+            <surname>Lv</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>Y.L.</given-names>
+            ;
+            <surname>Li</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>M.J.</surname>
+          </string-name>
+          ; Yuan,
+          <string-name>
+            <given-names>Y.L.</given-names>
+            ;
+            <surname>Zhu</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>Y.B.</given-names>
+            ;
+            <surname>Lu</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>W.C.</given-names>
+            ;
+            <surname>Cai</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Y.D.</surname>
+          </string-name>
+          <article-title>Prediction of RNA-binding proteins by voting systems</article-title>
+          .
+          <source>J. Biomed. Biotechnol</source>
+          .
+          <year>2011</year>
+          ,
+          <year>2011</year>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref43">
+        <mixed-citation>
+          43.
+          <string-name>
+            <surname>Yu</surname>
+            ,
+            <given-names>X.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Cao</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ; Cai,
+          <string-name>
+            <given-names>Y.</given-names>
+            ;
+            <surname>Shi</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>T.</given-names>
+            ;
+            <surname>Li</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>Y.</given-names>
+            <surname>Predicting</surname>
+          </string-name>
+          rRNA-,
+          <string-name>
+            <surname>RNA-</surname>
+          </string-name>
+          ,
+          <article-title>and DNA-binding proteins from primary structure with support vector machines</article-title>
+          .
+          <source>J. Theor. Biol</source>
+          .
+          <year>2006</year>
+          ,
+          <volume>240</volume>
+          ,
+          <fpage>175</fpage>
+          -
+          <lpage>184</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref44">
+        <mixed-citation>
+          44.
+          <string-name>
+            <surname>Hubbard</surname>
+            ,
+            <given-names>S.J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Thornton</surname>
+            ,
+            <given-names>J.M.</given-names>
+          </string-name>
+          NACCESS Computer Program; Department of Biochemistry and Molecular Biology, University College of London: London, UK,
+          <year>1993</year>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref45">
+        <mixed-citation>
+          45.
+          <string-name>
+            <surname>Kyte</surname>
+            , J.; Doolittle,
+            <given-names>R.F.</given-names>
+          </string-name>
+          <article-title>A simple method for displaying the hydropathic character of a protein</article-title>
+          .
+          <source>J. Mol. Biol</source>
+          .
+          <year>1982</year>
+          ,
+          <volume>157</volume>
+          ,
+          <fpage>105</fpage>
+          -
+          <lpage>132</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref46">
+        <mixed-citation>
+          46.
+          <string-name>
+            <surname>Stawiski</surname>
+            ,
+            <given-names>E.W.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Gregoret</surname>
+            ,
+            <given-names>L.M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Mandel-Gutfreund</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          <article-title>Annotating nucleic acid-binding function based on protein structure</article-title>
+          .
+          <source>J. Mol. Biol</source>
+          .
+          <year>2003</year>
+          ,
+          <volume>326</volume>
+          ,
+          <fpage>1065</fpage>
+          -
+          <lpage>1079</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref47">
+        <mixed-citation>
+          47.
+          <string-name>
+            <surname>Nayal</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Hitz</surname>
+            ,
+            <given-names>B.C.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Honig</surname>
+            ,
+            <given-names>B. GRASS:</given-names>
+          </string-name>
+          <article-title>A server for the graphical representation and analysis of structures</article-title>
+          .
+          <source>Protein Sci</source>
+          .
+          <year>1999</year>
+          ,
+          <volume>8</volume>
+          ,
+          <fpage>676</fpage>
+          -
+          <lpage>679</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref48">
+        <mixed-citation>
+          48.
+          <string-name>
+            <surname>Shazman</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ; Celniker,
+          <string-name>
+            <given-names>G.</given-names>
+            ;
+            <surname>Haber</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>O.</given-names>
+            ;
+            <surname>Glaser</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>F.</given-names>
+            ;
+            <surname>Mandel-Gutfreund</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>Y.</given-names>
+            <surname>Patch Finder</surname>
+          </string-name>
+          <article-title>Plus (PFplus): A web server for extracting and displaying positive electrostatic patches on protein surfaces</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2007</year>
+          ,
+          <volume>35</volume>
+          ,
+          <fpage>W526</fpage>
+          -
+          <lpage>W530</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref49">
+        <mixed-citation>
+          49.
+          <string-name>
+            <surname>Laskowski</surname>
+            ,
+            <given-names>R.A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Luscombe</surname>
+            ,
+            <given-names>N.M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Swindells</surname>
+            ,
+            <given-names>M.B.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Thornton</surname>
+            ,
+            <given-names>J.M.</given-names>
+          </string-name>
+          <article-title>Protein clefts in molecular recognition and function</article-title>
+          .
+          <source>Protein Sci</source>
+          .
+          <year>1996</year>
+          ,
+          <volume>5</volume>
+          ,
+          <fpage>2438</fpage>
+          -
+          <lpage>2452</lpage>
+          . [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref50">
+        <mixed-citation>
+          50.
+          <string-name>
+            <surname>Jeong</surname>
+          </string-name>
+          , E.;
+          <string-name>
+            <surname>Chung</surname>
+            ,
+            <given-names>I.F.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Miyano</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          <article-title>A neural network method for identification of RNA-interacting residues in protein</article-title>
+          .
+          <source>Genome Inform</source>
+          .
+          <year>2004</year>
+          ,
+          <volume>15</volume>
+          ,
+          <fpage>105</fpage>
+          -
+          <lpage>116</lpage>
+          . [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref51">
+        <mixed-citation>
+          51.
+          <string-name>
+            <surname>Terribilini</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Lee</surname>
+            ,
+            <given-names>J.H.</given-names>
+          </string-name>
+          ; Yan,
+          <string-name>
+            <given-names>C.</given-names>
+            ;
+            <surname>Jernigan</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>R.L.</given-names>
+            ;
+            <surname>Honavar</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>V.</given-names>
+            ;
+            <surname>Dobbs</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>D.</surname>
+          </string-name>
+          <article-title>Prediction of RNA binding sites in proteins from amino acid sequence</article-title>
+          .
+          <source>RNA</source>
+          <year>2006</year>
+          ,
+          <volume>12</volume>
+          ,
+          <fpage>1450</fpage>
+          -
+          <lpage>1462</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref52">
+        <mixed-citation>
+          52.
+          <string-name>
+            <surname>Kumar</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Gromiha</surname>
+            ,
+            <given-names>M.M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Raghava</surname>
+            ,
+            <given-names>G.P.</given-names>
+          </string-name>
+          <article-title>Prediction of RNA binding sites in a protein using SVM and PSSM profile</article-title>
+          .
+          <source>Proteins</source>
+          <year>2008</year>
+          ,
+          <volume>71</volume>
+          ,
+          <fpage>189</fpage>
+          -
+          <lpage>194</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref53">
+        <mixed-citation>
+          53.
+          <string-name>
+            <surname>Wang</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Xue</surname>
+            ,
+            <given-names>Z.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Shen</surname>
+            ,
+            <given-names>G.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Xu</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          <article-title>PRINTR: Prediction of RNA binding sites in proteins using SVM and profiles</article-title>
+          .
+          <source>Amino Acids</source>
+          <year>2008</year>
+          ,
+          <volume>35</volume>
+          ,
+          <fpage>295</fpage>
+          -
+          <lpage>302</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref54">
+        <mixed-citation>
+          54.
+          <string-name>
+            <surname>Tong</surname>
+            , J.; Jiang,
+            <given-names>P.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Lu</surname>
+            ,
+            <given-names>Z.H.</given-names>
+          </string-name>
+          <string-name>
+            <surname>RISP:</surname>
+          </string-name>
+          <article-title>A web-based server for prediction of RNA-binding sites in proteins</article-title>
+          .
+          <source>Comput. Methods Programs Biomed</source>
+          .
+          <year>2008</year>
+          ,
+          <volume>90</volume>
+          ,
+          <fpage>148</fpage>
+          -
+          <lpage>453</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref55">
+        <mixed-citation>
+          55.
+          <string-name>
+            <surname>Li</surname>
+            ,
+            <given-names>Q.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Cao</surname>
+            ,
+            <given-names>Z.</given-names>
+          </string-name>
+          ; Liu,
+          <string-name>
+            <surname>H. Improve</surname>
+          </string-name>
+          <article-title>the prediction of RNA-binding residues using structural neighbours</article-title>
+          .
+          <source>Protein Pept. Lett</source>
+          .
+          <year>2010</year>
+          ,
+          <volume>17</volume>
+          ,
+          <fpage>287</fpage>
+          -
+          <lpage>296</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref56">
+        <mixed-citation>
+          56.
+          <string-name>
+            <surname>Liu</surname>
+            ,
+            <given-names>Z.P.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Wu</surname>
+            ,
+            <given-names>L.Y.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Wang</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Zhang</surname>
+            ,
+            <given-names>X.S.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Chen</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          <article-title>Prediction of protein-RNA binding sites by a random forest method with combined features</article-title>
+          .
+          <source>Bioinformatics</source>
+          <year>2010</year>
+          ,
+          <volume>26</volume>
+          ,
+          <fpage>1616</fpage>
+          -
+          <lpage>1622</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref57">
+        <mixed-citation>
+          57.
+          <string-name>
+            <surname>Zhang</surname>
+          </string-name>
+          , T.; Zhang, H.;
+          <string-name>
+            <surname>Chen</surname>
+            ,
+            <given-names>K.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Ruan</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Shen</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Kurgan</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          <article-title>Analysis and prediction of RNA-binding residues using sequence, evolutionary conservation, and predicted secondary structure and solvent accessibility</article-title>
+          .
+          <source>Curr. Protein Pept. Sci</source>
+          .
+          <year>2010</year>
+          ,
+          <volume>11</volume>
+          ,
+          <fpage>609</fpage>
+          -
+          <lpage>628</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref58">
+        <mixed-citation>
+          58.
+          <string-name>
+            <surname>Walia</surname>
+            ,
+            <given-names>R.R.</given-names>
+          </string-name>
+          ; Xue,
+          <string-name>
+            <given-names>L.C.</given-names>
+            ;
+            <surname>Wilkins</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>K.</given-names>
+            ;
+            <surname>El-Manzalawy</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>Y.</given-names>
+            ;
+            <surname>Dobbs</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>D.</given-names>
+            ;
+            <surname>Honavar</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>V.</surname>
+          </string-name>
+          <article-title>RNABindRPlus: A predictor that combines machine learning and sequence homology-based methods to improve the reliability of predicted RNA-binding residues in proteins</article-title>
+          .
+          <source>PLoS ONE</source>
+          <year>2014</year>
+          ,
+          <volume>9</volume>
+          ,
+          <fpage>e97725</fpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref59">
+        <mixed-citation>
+          59.
+          <string-name>
+            <surname>Shao</surname>
+            ,
+            <given-names>X.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Tian</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Wu</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Wang</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Jing</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Deng</surname>
+            ,
+            <given-names>N.</given-names>
+          </string-name>
+          <article-title>Predicting DNA-</article-title>
+          and
+          <article-title>RNA-binding proteins from sequences with kernel methods</article-title>
+          .
+          <source>J. Theor. Biol</source>
+          .
+          <year>2009</year>
+          ,
+          <volume>258</volume>
+          ,
+          <fpage>289</fpage>
+          -
+          <lpage>293</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref60">
+        <mixed-citation>
+          60.
+          <string-name>
+            <surname>Kumar</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Gromiha</surname>
+            ,
+            <given-names>M.M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Raghava</surname>
+            ,
+            <given-names>G.P.</given-names>
+          </string-name>
+          <article-title>SVM based prediction of RNA-binding proteins using binding residues and evolutionary information</article-title>
+          .
+          <source>J. Mol. Recognit</source>
+          .
+          <year>2011</year>
+          ,
+          <volume>24</volume>
+          ,
+          <fpage>303</fpage>
+          -
+          <lpage>313</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref61">
+        <mixed-citation>
+          61.
+          <string-name>
+            <surname>Chen</surname>
+            ,
+            <given-names>Y.C.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Lim</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          <article-title>Predicting RNA-binding sites from the protein structure based on electrostatics, evolution and geometry</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2008</year>
+          ,
+          <volume>36</volume>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref62">
+        <mixed-citation>
+          62.
+          <string-name>
+            <surname>Maetschke</surname>
+            ,
+            <given-names>S.R.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Yuan</surname>
+            ,
+            <given-names>Z.</given-names>
+          </string-name>
+          <article-title>Exploiting structural and topological information to improve prediction of RNA-protein binding sites</article-title>
+          .
+          <source>BMC Bioinform</source>
+          .
+          <year>2009</year>
+          ,
+          <volume>10</volume>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref63">
+        <mixed-citation>
+          63.
+          <string-name>
+            <surname>Towfic</surname>
+            ,
+            <given-names>F.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Caragea</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Gemperline</surname>
+            ,
+            <given-names>D.C.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Dobbs</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Honavar</surname>
+            ,
+            <given-names>V.</given-names>
+          </string-name>
+          <string-name>
+            <surname>Struct-NB</surname>
+          </string-name>
+          :
+          <article-title>Predicting protein-RNA binding sites using structural features</article-title>
+          .
+          <source>Int. J. Data Min. Bioinform</source>
+          .
+          <year>2010</year>
+          ,
+          <volume>4</volume>
+          ,
+          <fpage>21</fpage>
+          -
+          <lpage>43</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref64">
+        <mixed-citation>
+          64.
+          <string-name>
+            <surname>Yang</surname>
+            ,
+            <given-names>X.X.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Deng</surname>
+            ,
+            <given-names>Z.L.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Liu</surname>
+            ,
+            <given-names>R.</given-names>
+          </string-name>
+          <article-title>RBRDetector: Improved prediction of binding residues on RNA-binding protein structures using complementary feature- and template-based strategies</article-title>
+          .
+          <source>Proteins</source>
+          <year>2014</year>
+          ,
+          <volume>82</volume>
+          ,
+          <fpage>2455</fpage>
+          -
+          <lpage>2471</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref65">
+        <mixed-citation>
+          65.
+          <string-name>
+            <surname>Yang</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Zhao</surname>
+            ,
+            <given-names>H.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Wang</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Zhou</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          <string-name>
+            <surname>SPOT-Seq-RNA</surname>
+          </string-name>
+          :
+          <article-title>Predicting protein-RNA complex structure and RNA-binding function by fold recognition and binding affinity prediction</article-title>
+          .
+          <source>Methods Mol. Biol</source>
+          .
+          <year>2014</year>
+          ,
+          <volume>1137</volume>
+          ,
+          <fpage>119</fpage>
+          -
+          <lpage>130</lpage>
+          . [PubMed]
+        </mixed-citation>
+      </ref>
+    </ref-list>
+  </back>
+</article>

@@ -1,0 +1,163 @@
+{
+    "object_id": "",
+    "etag": "",
+    "spec_version": "https://w3id.org/ieee/ieee-2791-schema/2791object.json",
+    "provenance_domain": {
+        "name": "RNAflow: An Effective and Simple RNA-Seq Differential Gene Expression Pipeline Using Nextflow",
+        "version": "2.0",
+        "license": "http://creativecommons.org/licenses/by/4.0/",
+        "created": "2024-08-09T13:55:01.489268Z",
+        "modified": "2024-08-09T13:55:01.489268Z",
+        "contributors": [
+            {
+                "name": "Aditya Lahiri",
+                "email": "adityalahiri06@gmail.com",
+                "affiliation": "George Washington University",
+                "contribution": [
+                    "curatedBy"
+                ]
+            }
+        ]
+    },
+    "usability_domain": [
+        "RNA-Seq enables the identification and quantification of RNA molecules, often with the aim of detecting differentially expressed genes (DEGs)",
+        "Although RNA-Seq evolved into a standard technique, there is no universal gold standard for these data's computational analysis",
+        "On top of that, previous studies proved the irreproducibility of RNA-Seq studies",
+        "Here, we present a portable, scalable, and parallelizable Nextflow RNA-Seq pipeline to detect DEGs, which assures a high level of reproducibility",
+        "The pipeline automatically takes care of common pitfalls, such as ribosomal RNA removal and low abundance gene filtering",
+        "Apart from various visualizations for the DEG results, we incorporated downstream pathway analysis for common species as Homo sapiens and Mus musculus",
+        "We evaluated the DEG detection functionality while using qRT-PCR data serving as a reference and observed a very high correlation of the logarithmized gene expression fold changes."
+    ],
+    "description_domain": {
+        "keywords": [
+            ""
+        ],
+        "pipeline_steps": [
+            {
+                "step_number": 1,
+                "name": "2.1. Implementation",
+                "description": "2.1. Implementation\nOur pipeline is implemented in a reactive workflow manager Nextflow v20.10.0 [11], which makes it portable, scalable, parallelizable, and ensures a high level of reproducibility. Furthermore, our implementation allows for selectively re-executing parts of the workflow in the case of additional inputs or configuration changes and to resume execution at the point where the workflow was stopped; this especially important in large-scale and time-consuming RNA-Seq studies. Additionally, time-consuming steps, such as indexing of a reference sequence, are only performed once when executing the workflow multiple times using the same working directory. Each step is encapsulated in a module exploiting dependency management via Conda (https://docs.conda.io) or container usage via Docker [12] or Singularity [13] for an easy installation and execution of the pipeline. Only Nextflow and Conda or Docker or Singularity need to be installed in order to run the pipeline. Currently, the optional transcriptome assembly steps only work with Docker or Singularity due to deprecated BioConda environments for certain tools. We provide configurations for local execution and the Slurm and LSF workload managers. Because Nextflow offers out-of-the-box execution for many schedulers and cloud computing platforms, it can be easily customized to meet individual needs. A recent study compared the currently most commonly used workflow management systems (Snakemake, Nextflow, CWL) with a focus on rapid prototyping for the analysis of ribosome profiling data and, finally, chose Nextflow, which best met the authors\u2019 requirements [14].\n\nThe pipeline that is presented here covers all necessary steps for a frequently performed DEG analysis by incorporating a selection of widely used and well established, but yet up-to-date, tools (Figure 1). In the past, we have performed various RNA-Seq expression studies and based our choice of tools on this experience. Therefore, for each step (such as trimming, mapping, and counting), we have selected tools that are highly cited, maintained, usable, and perform well in recent evaluation studies if available. We decided to use an alignment-based mapper, so that the user can actually inspect expression patterns and read mappings subsequently with a genome browser. Still, pseudo-alignment or alignment-free quantification tools, such as kallisto [15] and Sailfish [16], can serve as timeand resource-saving alternatives, and can be considered in a future extension. However, RNA-Seq pipelines that use pseudo-alignment methods are ranked low regarding accuracy [17].\n\nMost importantly, we automatically deal with common pitfalls in DEG detection with RNA-Seq data: ribosomal RNA (rRNA) is removed before mapping, the annotation is filtered for features of interest (genes and pseudogenes), low abundance features are filtered out (TPM filter), and quantification is based on uniquely mapped reads in order to ensure the most accurate result while using default parameters as possible. Although most RNA-Seq protocols include the depletion of rRNA before sequencing, moderate up to high amounts of rRNA can still be found in samples [18,19]. In particular, this is true for non-model organisms where library preparation kits are not optimized [20]. Therefore, we have decided to perform an rRNA cleaning step by default, which can be deactivated by the user. By providing such a default behavior of the pipeline, we allow non-experts to run a DEG analysis with almost no configuration effort to obtain robust results, while experienced users can still customize the pipeline, e.g., by also investigating DEGs that are based on multi-mapped reads. Only a basic understanding of the command line is required to install and run RNAflow. Nextflow and the containerization software can be run on Linux, Mac OS, and Windows supported through WSL2. CPU usage can be adjusted freely and it is automatically restricted to the number of available cores. The minimum RAM requirement heavily depends on the input data. However, in our experience, 8 GB RAM is sufficient for running a human-size RNA-Seq study. 2.1.1. Input\n\nOnly two parameters are required in any case: the RNA-Seq reads (single or paired-end) and a reference genome with a matching annotation (GTF format). File paths to the RNA-Seq read files and meta-data are provided via a comma-separated (CSV) table, where each line annotates one sample with a sample name, the path to the FASTQ file, in the case of paired-end data to both files, and the condition (such as \u2018control\u2019 or \u2018treated\u2019). The read files need to be in FASTQ format and they can be gzipped. For the genome and annotation, the user can make use of an automated download when working with data from Homo sapiens, Mus musculus, Mesocricetus auratus, or E. coli, just by specifying \u2018--species\u2019 with a three-letter shortcut (\u2018hsa\u2019, \u2018mmu\u2019, \u2018mau\u2019, and \u2018eco\u2019). Otherwise, CSV files pointing to the genome(s) in FASTA format and matching annotation(s) in GTF format have to be provided. The two input options can also be combined, which is particularly useful, for example, when investigating a viral infection in human cells. In such cases, all provided genomes and annotations are concatenated for further analysis. The pipeline was primarily built to work on Ensembl [21] annotations, but can also handle other annotations, which , however, might lead to reduced features in the final output. For example, we extract certain features from Ensembl annotations, such as the gene_biotype, in order to display this information in the final output tables. By default, a DEG analysis with all possible pairwise comparisons in one direction is performed based on the user-defined conditions in the initial CSV file. While using the \u2018--deg\u2019 parameter, this behavior can be configured and the user can specify which comparisons should be performed by providing an additional CSV file. With the \u2018--assembly\u2019 parameter, one can switch from DEG analysis to transcriptome assembly, where the genome(s) and annotation(s) are used for a reference-based transcriptome assembly. For tools that need a database (SortMeRNA [22], BUSCO [23], and dammit (http://www.camillescott.org/dammit)), the external resources are automatically downloaded and stored in a dedicated project-independent folder. Thus, Nextflow is able to check whether the resource is already available and it skips the download step the next time the pipeline is executed. The same procedure is used for the provided auto-download for genomes and annotations. Accordingly, the pipeline can run offline to a certain extent (pathway analyses still require a connection) if all online resources are initially downloaded.\n\n2.1.2. Preprocessing & Mapping\nQuality reports of raw reads and preprocessed reads are generated by FastQC v0.11.9 (https://www.bioinformatics.babraham.ac.uk/projects/fastqc/). Quality trimming and adapter clipping are performed by fastp v0.20.0 [24] in order to filter the raw reads with a sliding window approach and cutting options for front and tail \u2018-5 -3\u2019, a default window size of 4 (\u2018-W 4\u2019), and a default mean quality of 20 (\u2018-M 20\u2019). The minimum length is 15 bp (\u2018-l 15\u2019) and the maximal number of N base is 5 (\u2018-n 5\u2019). PloyX trimming in 3\u2019 ends is enabled (\u2018-x\u2019). The compression level for the compressed output is set to \u2018-z 6\u2019, in order to reduce memory usage in return for a longer compression time. All of the parameters for fastp can be changed with \u2018--fastp_additional_params\u2019. We chose to use fastp, because it is faster than other FASTQ preprocessing tools [24] while offering automatic adapter detection and many customization options for experienced users. While using the preprocessed reads, ribosomal RNA (rRNA) is removed with SortMeRNA v2.1b [22] when considering all of the available databases for SortMeRNA. This step can be skipped with \u2018--skip_sortmerna\u2019. Note that we stick to an older version 2.1b in order to avoid repeated indexing of the databases, which is not available in versions > 4. Besides, there are no algorithmic changes between versions 2.1b and 4. The trimmed and rRNA-cleaned reads are then mapped with HISAT2 v2.1.0 [25]. The output is directly piped into samtools, converted into BAM format, sorted, and then indexed. If the user provides more than one reference genome, all of the genomes are concatenated and one index is built and used for mapping. We have chosen HISAT2 as mapping software, because it has been continuously developed and maintained for several years [26]. In addition, a recent study on A. thaliana showed no major differences between RNA-Seq mapping tools in the context of DEG detection [27], which was also in accordance with a large RNA-Seq pipeline evaluation study recently performed by Corchete et al. [17].\n\n2.1.3. Quantification & Differential Gene Expression Analysis\nAll provided GTF annotation files are concatenated and filtered for gene and pseudogene features. We use featureCounts v2.0.1 [28] in order to quantify the mapped reads based on this processed annotation, chosen as a quantification tool that is highly cited and used in the community. Per default, we count non-multi-mapped reads on the exon level and summarize the counts into meta-features on the gene level. The strand-specific counting is set to un-stranded by default and it can be changed with \u2018--strand 1\u2019 to stranded and \u2018--strand 2\u2019 to reversely stranded. If the user is unsure about the strandness of the data, then the pipeline can run first in un-stranded mode, then the alignments can be investigated, for example, via IGV [29], and then the pipeline can be resumed (\u2018-resume\u2019) after the mapping step using the appropriate strand information. We implemented a TPM (Transcript Per Million) normalization and filter step, as proposed in [30]. For each gene, the TPM value is calculated, followed by the calculation of the mean TPM in each condition. A gene needs to have at least one mean TPM greater than the threshold (default 1) to be considered in the further pipeline. The user can adjust the threshold with \u2018--tpm\u2019. All of the results so far are summarized in a MultiQC v1.9 [31] report. The filtered count tables are passed to the DESeq2 module v1.28.0 [32] as the to date most cited and still maintained tool for DEG calling. We apply DESeq2 normalization, as well as different transformations (regularized log (rlog), variance stabilizing, and log2(n + 1) transformation) . We generate PCA plots of all samples on all types of transformed counts on the 50, 100, and 500 genes with the highest variance and heatmaps on all types of transformed counts on the 50 and 100 genes with the highest counts and most variable genes. Next, we perform pairwise comparisons, per default all possible comparisons in one direction, and shrink the resulting logarithmized fold changes (logFCs) with the lfcShrink and apeglm [33] method (see DESeq2 vignette for details) comparison-wise. The user can specify specific pairwise comparisons with \u2018--deg\u2019. The result tables are filtered by adjusted p-value < 0.05 and adjusted p-value < 0.01. The unfiltered and filtered tables are available in CSV and Excel format, and as searchable and sortable HTML documents, including expression box plots and further information for each gene that is produced by the ReportingTools R package [34]. Furthermore, the results are visualized with volcano (that is generated with EnhancedVolcano, https://github.com/kevinblighe/EnhancedVolcano), MA and PCA plots, sample-to-sample heatmaps, heatmaps on genes with highest counts, on genes with highest logFCs, and on DEGs with the highest logFCs. Many of these plots are also summarized in an HTML regionReport [35], which allows for a first exploration of the DESeq2 results. For some supported species, the pipeline performs an integrated downstream pathway analysis: WebGestalt [36] runs a gene set enrichment analysis (GSEA) for Homo sapiens and Mus musculus; and, the piano R package [37] performs a GSEA with different settings and consensus scoring for Homo sapiens, Mus musculus, and Mesocricetus auratus. We aim to extend the list of supported species in the future and on-demand.\n\n2.1.4. Transcriptome Assembly\nIn the absence of an appropriate reference genome, the user might want to first generate a de novo transcriptome assembly. Although not the initial focus of our pipeline, we allow, via \u2018--assembly\u2019, to switch from DEG analysis to basic transcriptome assembly (Figure 1). Following a recent comparison study [38], we chose Trinity v2.11.0 [39] in order to assemble the rRNA-free or trimmed reads de novo accompanied by a reference-based assembly generated by StringTie2 v2.1.2 [40]. Both of the transcriptome assemblies are functionally annotated with dammit v1.2 (http://www.camillescott.org/dammit). Dammit unites different databases for annotation: Pfam-A, Rfam, OrthoDB, and BUSCO. Besides a pure annotation purpose, the results that are provided by BUSCO v3.0.2 [23] can be used as a common metric in order to evaluate the quality and completeness of both transcriptomes that are based on expected gene content premised on evolutionary principles. 2.1.5. Output\n\nFor each step of the pipeline, all of the essential results, e.g., trimmed read files from fastp and BAM files from HISAT2, are easily accessible and they can be used for further investigations outside of the pipeline. The plots are provided as PDF files, tables as CSV, and Excel files. A summary or report information are generally accessible through the MultiQC report.\n\n",
+                "versions": "",
+                "input_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.532292Z",
+                    "uri": "https://docs.conda.io",
+                    "sha1_checksum": ""
+                },
+                "output_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.532292Z",
+                    "uri": "",
+                    "sha1_checksum": ""
+                }
+            },
+            {
+                "step_number": 2,
+                "name": "2.2. DEG Validation of RNA-Seq with Publicly Available qRT-PCR Data",
+                "description": "2.2. DEG Validation of RNA-Seq with Publicly Available qRT-PCR Data\nIn order to validate our differential expression analysis procedure, we compared our results with publicly available qRT-PCR data considering these data as the gold standard. We adopted, like Costa-Silva et al. [41], a real RNA-Seq and qRT-PCR dataset, which is part of the Microarray Quality Control (MAQC) project and covers expression data from two conditions that we compare:Stratagene Universal Human Reference RNA (UHR) and Ambion Human Brain Reference RNA (Brain). The UHR data are composed of total RNA from 10 human cell lines. As part of the MAQC project, these are well-characterized datasets, in which, inter alia, over a thousand genes have been examined with qRT-PCR [42,43].\n\nThe single-end short reads are available under the NCBI Short-Read Archive (SRA) accessions SRR037445-SRR037451 (UHR, seven biological replicates) and SRR035678, SRR037439-SRR37444 (Brain, seven biological replicates) [44]. qRT-PCR data are available under Gene Expression Omnibus (GEO) accession GSE5350, platform GPL4097, sample accessions: GSM129638-GSM129641 (UHR), and GSM129642-GSM129645 (Brain) [42].\n\nShort-read RNA-Seq data were analyzed by our pipeline (branch: master, commit:b3cf528f3142a2890287ac8445e7ed44ae187331, and Ensembl release 98) on a high performance cluster running the Slurm workload manager. All of the parameters were set to default, except \u2018--tpm 0\u2019, to skip the TPM filter. The unfiltered DESeq2 result table (available on the Open Science Framework (OSF) doi.org/10.17605/OSF.IO/SZEFK) was picked for the comparison.\n\nqRT-PCR data were analyzed by adopting an R script (available on OSF doi.org/10.17605/OSF. IO/SZEFK) retrieved from https://www.ncbi.nlm.nih.gov/geo/geo2r/ with default parameters and differential expression analysis was done with limma v3.42.0 [45]. All of the genes with duplicated gene symbols were excluded, in order to ensure a one-to-one mapping between qRT-PCR and RNA-Seq results.\n\nBoth unfiltered result tables were merged by gene symbol, so that each gene of the qRT-PCR dataset could be compared with the corresponding result of the RNA-Seq analysis. We considered genes to be differentially expressed with an adjusted p-value 0.05 of qRT-PCR results. logFC correlation was calculated with the Pearson method and plotted while using ggscatter of the ggpubr R package (https://github.com/kassambara/ggpubr).\n\n",
+                "versions": "",
+                "input_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.540292Z",
+                    "uri": "doi.org/10.17605/OSF.IO/SZEFK)",
+                    "sha1_checksum": ""
+                },
+                "output_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.540292Z",
+                    "uri": "",
+                    "sha1_checksum": ""
+                }
+            },
+            {
+                "step_number": 3,
+                "name": "2.3. Transcriptome Assembly Validation",
+                "description": "2.3. Transcriptome Assembly Validation\nIn order to validate the optional transcriptome assembly functionality that is provided by RNAflow, we selected three RNA-Seq read sets from different species that were recently used in a large de novo transcriptome assembly benchmark [38]. We downloaded all of the assemblies and the corresponding raw reads for the E. coli (eco), A. thaliana (ath), and M. musculus (mmu) data sets from OSF (doi. org/10.17605/OSF.IO/5ZDX4) and run RNAflow with the \u2018--assembly --skip_sortmerna\u2019 options and otherwise default parameters on each data set. We skipped the rRNA depletion step, because no depletion was performed by H\u00f6lzer and Marz [38]. The transcriptome assembly calculations were performed with release v1.1.0 of RNAflow. Finally, we benchmarked and visualized RNAflow\u2019s assembly results that were achieved with Trinity and StringTie2, together with the ten different assemblies from H\u00f6lzer and Marz [38] for each data set using BUSCO v3.0.2 and MultiQC v1.9. We selected the following BUSCO databases per data set: eco \u2013 enterobacteriales_odb9; ath \u2013 embryophyta_odb9; mmu \u2013 euarchontoglires_odb9. All of the assemblies calculated with RNAflow are available at doi.org/10. 17605/OSF.IO/SZEFK.\n\n",
+                "versions": "",
+                "input_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.544335Z",
+                    "uri": "doi.org/10.",
+                    "sha1_checksum": ""
+                },
+                "output_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.544335Z",
+                    "uri": "",
+                    "sha1_checksum": ""
+                }
+            }
+        ]
+    },
+    "execution_domain": {
+        "external_data_endpoints": [],
+        "environment_variables": {},
+        "scripts": [],
+        "software_prerequisites": [
+            {
+                "filename": "docs.conda.io",
+                "uri": "https://docs.conda.io",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": "dammit)",
+                "uri": "http://www.camillescott.org/dammit)",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": "",
+                "uri": "https://www.bioinformatics.babraham.ac.uk/projects/fastqc/",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": "EnhancedVolcano),",
+                "uri": "https://github.com/kevinblighe/EnhancedVolcano),",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": "dammit",
+                "uri": "http://www.camillescott.org/dammit",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": "SZEFK)",
+                "uri": "doi.org/10.17605/OSF.IO/SZEFK)",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": "OSF.",
+                "uri": "doi.org/10.17605/OSF.",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": "",
+                "uri": "https://www.ncbi.nlm.nih.gov/geo/geo2r/",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": "ggpubr",
+                "uri": "https://github.com/kassambara/ggpubr",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": "10.",
+                "uri": "doi.org/10.",
+                "access_time": "",
+                "sha1_checksum": ""
+            }
+        ]
+    },
+    "extension_domain": {},
+    "error_domain": {},
+    "parametric_domain": [],
+    "io_domain": {}
+}

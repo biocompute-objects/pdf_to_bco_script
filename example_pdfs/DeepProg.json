@@ -1,0 +1,244 @@
+{
+    "object_id": "",
+    "etag": "",
+    "spec_version": "https://w3id.org/ieee/ieee-2791-schema/2791object.json",
+    "provenance_domain": {
+        "name": "DeepProg: an ensemble of deep-learning and machine-learning models for prognosis prediction using multi-omics data",
+        "version": "2.0",
+        "license": "http://creativecommons.org/licenses/by/4.0/",
+        "created": "2024-08-09T13:55:01.254794Z",
+        "modified": "2024-08-09T13:55:01.254794Z",
+        "contributors": [
+            {
+                "name": "Aditya Lahiri",
+                "email": "adityalahiri06@gmail.com",
+                "affiliation": "George Washington University",
+                "contribution": [
+                    "curatedBy"
+                ]
+            },
+            {
+                "email": "",
+                "orcid": "",
+                "name": "Olivier B. Poirion",
+                "affiliation": "0Current address: Computational Sciences, The Jackson Laboratory4University of Hawaii Cancer Center",
+                "contribution": [
+                    "authoredBy"
+                ]
+            },
+            {
+                "email": "",
+                "orcid": "",
+                "name": "Zheng Jing",
+                "affiliation": "2Current address: Department of Computational Medicine and Bioinformatics, University of Michigan",
+                "contribution": [
+                    "authoredBy"
+                ]
+            },
+            {
+                "email": "",
+                "orcid": "",
+                "name": "Kumardeep Chaudhary",
+                "affiliation": "3Current address: Department of Genetics and Genomic Sciences, Icahn School of Medicine at Mount Sinai4University of Hawaii Cancer Center",
+                "contribution": [
+                    "authoredBy"
+                ]
+            },
+            {
+                "email": "",
+                "orcid": "",
+                "name": "Sijia Huang",
+                "affiliation": "1Current address: Department of Biostatistics, Epidemiology and Informatics, University of Pennsylvania4University of Hawaii Cancer Center",
+                "contribution": [
+                    "authoredBy"
+                ]
+            },
+            {
+                "email": "",
+                "orcid": "",
+                "name": "Lana X. Garmire",
+                "affiliation": "2Current address: Department of Computational Medicine and Bioinformatics, University of Michigan4University of Hawaii Cancer Center",
+                "contribution": [
+                    "authoredBy"
+                ]
+            }
+        ]
+    },
+    "usability_domain": [
+        "Multi-omics data are good resources for prognosis and survival prediction; however, these are difficult to integrate computationally",
+        "We introduce DeepProg, a novel ensemble framework of deep-learning and machine-learning approaches that robustly predicts patient survival subtypes using multi-omics data",
+        "It identifies two optimal survival subtypes in most cancers and yields significantly better risk-stratification than other multi-omics integration methods",
+        "DeepProg is highly predictive, exemplified by two liver cancer (C-index 0.73-0.80) and five breast cancer datasets (C-index 0.68-0.73)",
+        "Pan-cancer analysis associates common genomic signatures in poor survival subtypes with extracellular matrix modeling, immune deregulation, and mitosis processes",
+        "DeepProg is freely available at https://github.com/lanagarmire/DeepProg"
+    ],
+    "description_domain": {
+        "keywords": [
+            ""
+        ],
+        "pipeline_steps": [
+            {
+                "step_number": 1,
+                "name": "TCGA datasets",
+                "description": "TCGA datasets\nWe obtain the 32 cancer multi-omic datasets from NCBI using TCGA portal (https://tcga-data.nci.nih.gov/tcga/). We use the package TCGA-Assembler (versions 2.0.5) and write custom scripts to download RNA-Seq (UNC IlluminaHiSeq RNASeqV2), miRNA Sequencing (BCGSC IlluminaHiSeq, Level 3), and DNA methylation (JHU-USC HumanMethylation450) data from the TCGA website on November 4\u201314, 2017. We also obtain the survival information from the portal: https://portal.gdc. cancer.gov/. We use the same preprocessing steps as detailed in our previous study [18]. We first download RNA-Seq, miRNA-Seq, and methylation data using the functions DownloadRNASeqData, DownloadmiRNASeqData, and DownloadMethylationData from TCGAAssembler, respectively. Then, we process the data with the functions ProcessRNASeqData, ProcessmiRNASeqData, and ProcessMethylation450Data. In addition, we process the methylation data with the function CalculateSingleValueMethylationData. Finally, for each omic data type, we create a gene-by-sample data matrix in the Tabular Separated Value (TSV) format using a custom script.\n\n",
+                "versions": "",
+                "input_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.258954Z",
+                    "uri": "https://tcga-data.nci.nih.gov/tcga/",
+                    "sha1_checksum": ""
+                },
+                "output_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.258954Z",
+                    "uri": "",
+                    "sha1_checksum": ""
+                }
+            },
+            {
+                "step_number": 2,
+                "name": "Validation datasets",
+                "description": "Validation datasets\nFor breast cancer data, we use four public breast cancer gene expression microarray datasets and one Metabric RNA-Seq dataset as the validation datasets. Four public datasets (all on Affymetrix HG-U133A microarray platform) were downloaded from Gene Expression Omnibus (GEO). Their accession IDs are GSE4922 [19], GSE1456 [20], GSE3494 [21], and GSE7390 [22]. Their preprocessing was described in a previous study [23]. For the Metabric dataset, we obtain approval from the Synapse repository: https://www.synapse.org/#!Synapse:syn1688369, and used the provided normalized data described in the Breast Cancer Challenge [24]. The metabric dataset consists of 1981 breast cancer samples, from which we extract RNA-Seq data. For hepatocarcinoma datasets, we use two larger datasets: LIRI and GSE datasets, as described in the previous study [18].\n\n",
+                "versions": "",
+                "input_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.262938Z",
+                    "uri": "https://www.synapse.org/#!Synapse:syn1688369,",
+                    "sha1_checksum": ""
+                },
+                "output_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.262938Z",
+                    "uri": "",
+                    "sha1_checksum": ""
+                }
+            },
+            {
+                "step_number": 3,
+                "name": "Hyperparameter tuning",
+                "description": "Hyperparameter tuning\nTo help selecting the best set of hyperparameters (i.e., number of epochs, network shape, dropout rate\u2026), DeepProg has an optional hyperparameter tuning module based on Gaussian optimization and it relies on the scikit-optimize (https://scikit-optimize.github.io/stable/) and the tune (https://docs.ray.io/en/latest/tune.html) python libraries. The computation of the ensemble of models and/or the hyperparameters grid-search can optionally be distributed on multiple nodes and external supercomputers using the python ray framework (https://docs.ray.io/en/latest/).\n\n",
+                "versions": "",
+                "input_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.275056Z",
+                    "uri": "https://scikit-optimize.github.io/stable/",
+                    "sha1_checksum": ""
+                },
+                "output_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.275056Z",
+                    "uri": "",
+                    "sha1_checksum": ""
+                }
+            },
+            {
+                "step_number": 4,
+                "name": "Selection of new hidden-layer features linked to survival",
+                "description": "Selection of new hidden-layer features linked to survival\nFor each of the transformed feature in the hidden layer, we build a univariate Cox-PH model using the python package lifelines (https://github.com/CamDavidsonPilon/lifelines) and identify those with log-rank p values (Wilcoxon test) < 0.01. We then extract all the significant new latent features from all autoencoders and combine them as a new matrix Z.\n\n",
+                "versions": "",
+                "input_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.277055Z",
+                    "uri": "https://github.com/CamDavidsonPilon/lifelines",
+                    "sha1_checksum": ""
+                },
+                "output_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.277055Z",
+                    "uri": "",
+                    "sha1_checksum": ""
+                }
+            },
+            {
+                "step_number": 5,
+                "name": "Code availability",
+                "description": "Code availability\nThe source code and documentation for the DeepProg framework is free for non-commercial use under GPL v3 license at: https://github.com/lanagarmire/DeepProg. The workflow is written in Python3 and tested under Linux, OSX, and Windows. The package contains instructions for installation and usage and the different requirements. A docker image containing all the dependencies installed is also freely available at: https://hub.docker.com/repository/docker/opoirion/deepprog_docker.\n\n",
+                "versions": "",
+                "input_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.302168Z",
+                    "uri": "https://github.com/lanagarmire/DeepProg.",
+                    "sha1_checksum": ""
+                },
+                "output_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.302168Z",
+                    "uri": "",
+                    "sha1_checksum": ""
+                }
+            }
+        ]
+    },
+    "execution_domain": {
+        "external_data_endpoints": [],
+        "environment_variables": {},
+        "scripts": [
+            {
+                "filename": "DeepProg",
+                "uri": "https://github.com/lanagarmire/DeepProg",
+                "access_time": "",
+                "sha1_checksum": ""
+            }
+        ],
+        "software_prerequisites": [
+            {
+                "filename": "",
+                "uri": "https://tcga-data.nci.nih.gov/tcga/",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": ".",
+                "uri": "cancer.gov/.",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": "#!Synapse:syn1688369,",
+                "uri": "https://www.synapse.org/#!Synapse:syn1688369,",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": "",
+                "uri": "https://scikit-optimize.github.io/stable/",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": "tune.html",
+                "uri": "https://docs.ray.io/en/latest/tune.html",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": "",
+                "uri": "https://docs.ray.io/en/latest/",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": "lifelines",
+                "uri": "https://github.com/CamDavidsonPilon/lifelines",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": "DeepProg.",
+                "uri": "https://github.com/lanagarmire/DeepProg.",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": "deepprog_docker.",
+                "uri": "https://hub.docker.com/repository/docker/opoirion/deepprog_docker.",
+                "access_time": "",
+                "sha1_checksum": ""
+            }
+        ]
+    },
+    "extension_domain": {},
+    "error_domain": {},
+    "parametric_domain": [],
+    "io_domain": {}
+}

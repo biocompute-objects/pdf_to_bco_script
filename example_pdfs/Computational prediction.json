@@ -1,0 +1,98 @@
+{
+    "object_id": "",
+    "etag": "",
+    "spec_version": "https://w3id.org/ieee/ieee-2791-schema/2791object.json",
+    "provenance_domain": {
+        "name": "Computational Prediction of RNA-Binding Proteins and Binding Sites",
+        "version": "2.0",
+        "license": "http://creativecommons.org/licenses/by/4.0/",
+        "created": "2024-08-09T13:55:01.004085Z",
+        "modified": "2024-08-09T13:55:01.004085Z",
+        "contributors": [
+            {
+                "name": "Aditya Lahiri",
+                "email": "adityalahiri06@gmail.com",
+                "affiliation": "George Washington University",
+                "contribution": [
+                    "curatedBy"
+                ]
+            }
+        ]
+    },
+    "usability_domain": [
+        "Proteins and RNA interaction have vital roles in many cellular processes such as protein synthesis, sequence encoding, RNA transfer, and gene regulation at the transcriptional and post-transcriptional levels",
+        "Approximately 6%-8% of all proteins are RNA-binding proteins (RBPs)",
+        "Distinguishing these RBPs or their binding residues is a major aim of structural biology",
+        "Previously, a number of experimental methods were developed for the determination of protein-RNA interactions",
+        "However, these experimental methods are expensive, time-consuming, and labor-intensive",
+        "Alternatively, researchers have developed many computational approaches to predict RBPs and protein-RNA binding sites, by combining various machine learning methods and abundant sequence and/or structural features",
+        "There are three kinds of computational approaches, which are prediction from protein sequence, prediction from protein structure, and protein-RNA docking",
+        "In this paper, we review all existing studies of predictions of RNA-binding sites and RBPs and complexes, including data sets used in different approaches, sequence and structural features used in several predictors, prediction method classifications, performance comparisons, evaluation methods, and future directions."
+    ],
+    "description_domain": {
+        "keywords": [
+            ""
+        ],
+        "pipeline_steps": [
+            {
+                "step_number": 1,
+                "name": "2.1. Data Set",
+                "description": "2.1. Data Set\nThe sequence and structure of protein\u2013RNA complexes are available from PDB database and other specific protein\u2013RNA interaction databases (Available online:http://pridb.gdcb.iastate.edu/) [25]. We analyzed several previous studies and summarize the datasets and methods used, which are listed in detail in Table 1. Of all existing datasets, RB344 is the largest and contains 344 non-redundant RBPs with at least 30% sequence identity [26]. In several studies, authors employed the same dataset to compare the advantages and disadvantages of various methods. In particular, Cheng et al. [27] constructed a novel PRIPU dataset which differed from previous datasets. The PRIPU dataset contained positive and unlabeled, but not negative samples. Such negative samples sometimes are not necessarily genuine negative samples and may even be unknown positive samples.\n\nRNA-binding residues are determined using two definitions: (i) a residue with any atom within 3\u20136 \u00c5 of any atom in a nucleotide; and (ii) residues involved in hydrophobic, electrostatic interactions with nucleotides, van der Waals, or hydrogen-bonding [25]. Residues satisfying these definitions are considered to be RNA-binding residues. As with protein\u2013DNA complexes and protein\u2013protein complexes, similar sequences in protein\u2013RNA interactions are eliminated before dataset construction. Generally, sequences with similarities greater than 30%\u201340% are considered redundant. Clustering programs such as blastclust (available from NCBI), CD-HIT [34], and the PISCES web server are used to generate a non-redundant dataset.\n\n",
+                "versions": "",
+                "input_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.010087Z",
+                    "uri": "http://pridb.gdcb.iastate.edu/)",
+                    "sha1_checksum": ""
+                },
+                "output_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.010087Z",
+                    "uri": "",
+                    "sha1_checksum": ""
+                }
+            },
+            {
+                "step_number": 2,
+                "name": "2.2. Feature Selection for RNA-Binding Residues and Protein Predictors",
+                "description": "2.2. Feature Selection for RNA-Binding Residues and Protein Predictors\nMany features have been used to identify RBPs and binding sites. There are three kinds of features here, which are structure-based features, sequence-based features, chemical and physical features. The commonly used features summarized here include amino acid composition, sequence similarity, evolutionary information, accessible surface area (ASA), predicted secondary structures (SSs), hydrophobicity, electrostatic patches, cleft sizes, and other global protein features. Details of these features are shown as follows.\n\n2.2.1. Sequence-Based Features\nAmino Acid Composition\nOne of the most commonly used features of protein sequence is protein amino acid composition, not only in protein\u2013protein interaction site prediction, but also in RNA-binding site prediction. The 20 amino acids exhibit various properties based on the presence of hydrophobic residues (G, F, L, M, A, I, P, V), polar residues (Q, T, S, N, C, Y, W), and charged residues (H, R, K, E, D) [35]. One of the encoding methods are based on the physicochemical properties of the various residue types. The hydrophobic, polar, charged and residues are encoded as (1 0), (0 1), and (0 0), respectively. Particularly, the positively-charged RNA backbone is usually more likely to combine with the negatively-charged residues, as shown in previous studies [36]. The other encoding method is standard binary encoding, which encodes each amino acid as a 20-dimensional binary vector, such as E (0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0), F (0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0), A (1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0), . . . , and Y (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1).\n\nSequence Similarity\nSequence similarity (also referred to as sequence conservation) is frequently used for RNA-binding site prediction. The BLAST and PSI-BLAST programs are used to compare the similarities among various protein sequences. Generally, multiple sequence alignment (MSA) were obtained by comparing query sequences against the NCBI non-redundant database and were used to calculate each residue\u2019s sequence similarity score. A number of conservation scoring tools are available including relative entropy, von Neumann entropy, Shannon entropy, and Scorecons.\n\nEvolutionary Information\nEvolutionary information has often been introduced in functional site predictors in recent studies, including RNA-binding site prediction. Previous studies showed that position-specific scoring matrix (PSSM) (an important form of evolutionary information) greatly improved the performance of RBPs prediction. PSSMs were used widely in pervious prediction studies because they provide the likelihood of a particular residue substitution based on evolutionary information.\n\n2.2.2. Structure-Based Features\nThe Secondary Structure (SS)\nThe secondary structure (SS) provides local and geometric patterns, which can be obtained in two ways: One is that the protein structure is available and real SS could be calculated using SS assignment approach such as DSSPcont [37,38], the other is that the protein structure is unavailable and predicted SS could be obtained using SS predicted algorithm such as PSIPRED [38\u201340]. SS has been employed as an encoding feature in several studies to predict RNA-binding residues [41,42].\n\nAccessible Surface Area (ASA)\nRNA-binding residues tend to be exposed and interact with proteins, so calculation of solvent accessibility would be helpful in RNA-binding sites prediction. The relative ASA could be calculated using NACCESS [43,44], while the protein structure is available. It is worth pointing out that the relative ASA could not be calculated when the DNA molecule was absent. Residues with ASA value greater than 5% are defined as surface accessible residues.\n\n2.2.3. Chemical and Physical Features\nHydrophobicity\nHydrophobicity, which represents the proportion of residues repelled by water, is frequently used by RNA-binding site predictors. Hydrophobicity scale was defined with numerical value for each amino acid [45].\n\nElectrostatic Patches\nCleft Size\nA protein surface status can be described by electrostatic patches. Generally, nucleic acid-binding interfaces are more likely to be positively charged electrostatic patches [46]. Electrostatic patches can be computed using GRASP [47], GRASS [48], or the web server PFplus (PatchFinderPlus; Available online: http://pfp.technion.ac.il) [49].\n\nCleft size is an important feature because the largest cleft on a protein surface tends to be where the protein active site is located [50]. The charge, dipole, and quadrupole moments can also be used to adequately recognize RBPs [51].\n\n",
+                "versions": "",
+                "input_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.025085Z",
+                    "uri": "http://pfp.technion.ac.il",
+                    "sha1_checksum": ""
+                },
+                "output_list": {
+                    "filename": "",
+                    "access_time": "2024-08-09T13:55:01.025085Z",
+                    "uri": "",
+                    "sha1_checksum": ""
+                }
+            }
+        ]
+    },
+    "execution_domain": {
+        "external_data_endpoints": [],
+        "environment_variables": {},
+        "scripts": [],
+        "software_prerequisites": [
+            {
+                "filename": ")",
+                "uri": "http://pridb.gdcb.iastate.edu/)",
+                "access_time": "",
+                "sha1_checksum": ""
+            },
+            {
+                "filename": "pfp.technion.ac.il",
+                "uri": "http://pfp.technion.ac.il",
+                "access_time": "",
+                "sha1_checksum": ""
+            }
+        ]
+    },
+    "extension_domain": {},
+    "error_domain": {},
+    "parametric_domain": [],
+    "io_domain": {}
+}

@@ -1,0 +1,76 @@
+{
+    "object_id": "",
+    "etag": "",
+    "spec_version": "https://w3id.org/ieee/ieee-2791-schema/2791object.json",
+    "provenance_domain": {
+        "name": "Predictive modeling of moonlighting DNA-binding proteins",
+        "version": "2.0",
+        "license": "http://creativecommons.org/licenses/by/4.0/",
+        "created": "2024-08-09T13:55:01.722301Z",
+        "modified": "2024-08-09T13:55:01.722301Z",
+        "contributors": [
+            {
+                "name": "Aditya Lahiri",
+                "email": "adityalahiri06@gmail.com",
+                "affiliation": "George Washington University",
+                "contribution": [
+                    "curatedBy"
+                ]
+            },
+            {
+                "email": "",
+                "orcid": "",
+                "name": "Dana Mary Varghese",
+                "affiliation": "2School of Computational and Integrative Sciences, Jawaharlal Nehru University",
+                "contribution": [
+                    "authoredBy"
+                ]
+            },
+            {
+                "email": "",
+                "orcid": "",
+                "name": "Ruth Nussinov",
+                "affiliation": "0Computational Structural Biology Section, Cancer Innovation Laboratory, Frederick National Laboratory for Cancer Research1Department of Human Molecular Genetics and Biochemistry, Sackler School of Medicine, Tel Aviv University",
+                "contribution": [
+                    "authoredBy"
+                ]
+            },
+            {
+                "email": "",
+                "orcid": "",
+                "name": "Shandar Ahmad",
+                "affiliation": "",
+                "contribution": [
+                    "authoredBy"
+                ]
+            }
+        ]
+    },
+    "usability_domain": [
+        "Moonlighting proteins are multifunctional, singlepolypeptide chains capable of performing multiple autonomous functions",
+        "Most moonlighting proteins have been discovered through work unrelated to their multifunctionality",
+        "We believe that prediction of moonlighting proteins from first principles, that is, using sequence, predicted structure, evolutionary profiles, and global gene expression profiles, for only one functional class of proteins in a single organism at a time will significantly advance our understanding of multifunctional proteins",
+        "In this work, we investigated human moonlighting DNA-binding proteins (mDBPs) in terms of properties that distinguish them from other (non-moonlighting) proteins with the same DNA-binding protein (DBP) function",
+        "Following a careful and comprehensive analysis of discriminatory features, a machine learning model was developed to assess the predictability of mDBPs from other DBPs (oDBPs)",
+        "We observed that mDBPs can be discriminated from oDBPs with high accuracy of 74% AUC of ROC using these first principles features",
+        "A number of novel predicted mDBPs were found to have literature support for their being moonlighting and others are proposed as candidates, for which the moonlighting function is currently unknown",
+        "We believe that this work will help in deciphering and annotating novel moonlighting DBPs and scale up other functions",
+        "The source codes and data sets used for this work are freely available at https://zenodo.org/record/7299265#.Y2pO3ctBxPY"
+    ],
+    "description_domain": {
+        "keywords": [
+            ""
+        ],
+        "pipeline_steps": []
+    },
+    "execution_domain": {
+        "external_data_endpoints": [],
+        "environment_variables": {},
+        "scripts": [],
+        "software_prerequisites": []
+    },
+    "extension_domain": {},
+    "error_domain": {},
+    "parametric_domain": [],
+    "io_domain": {}
+}

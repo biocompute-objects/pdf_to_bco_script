@@ -1,0 +1,3969 @@
+<!DOCTYPE article PUBLIC "-//NLM//DTD JATS (Z39.96) Journal Archiving and Interchange DTD v1.0 20120330//EN" "JATS-archivearticle1.dtd">
+<article xmlns:xlink="http://www.w3.org/1999/xlink">
+  <front>
+    <journal-meta>
+      <journal-title-group>
+        <journal-title>NAR Genomics and Bioinformatics</journal-title>
+      </journal-title-group>
+    </journal-meta>
+    <article-meta>
+      <title-group>
+        <article-title>Predictive modeling of moonlighting DNA-binding proteins</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author">
+          <string-name>Dana Mary Varghese</string-name>
+          <xref ref-type="aff" rid="aff2">2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <string-name>Ruth Nussinov</string-name>
+          <xref ref-type="aff" rid="aff0">0</xref>
+          <xref ref-type="aff" rid="aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <string-name>Shandar Ahmad</string-name>
+          <email>shandar@jnu.ac.in</email>
+        </contrib>
+        <aff id="aff0">
+          <label>0</label>
+          <institution>Computational Structural Biology Section, Cancer Innovation Laboratory, Frederick National Laboratory for Cancer Research</institution>
+          ,
+          <addr-line>Frederick, MD 21702</addr-line>
+          ,
+          <country country="US">USA</country>
+        </aff>
+        <aff id="aff1">
+          <label>1</label>
+          <institution>Department of Human Molecular Genetics and Biochemistry, Sackler School of Medicine, Tel Aviv University</institution>
+          ,
+          <country country="IL">Israel</country>
+        </aff>
+        <aff id="aff2">
+          <label>2</label>
+          <institution>School of Computational and Integrative Sciences, Jawaharlal Nehru University</institution>
+          ,
+          <addr-line>New Delhi- 110067</addr-line>
+          ,
+          <country country="IN">India</country>
+        </aff>
+      </contrib-group>
+      <pub-date>
+        <year>2022</year>
+      </pub-date>
+      <volume>4</volume>
+      <issue>4</issue>
+      <history>
+        <date date-type="accepted">
+          <day>11</day>
+          <month>11</month>
+          <year>2022</year>
+        </date>
+        <date date-type="received">
+          <day>06</day>
+          <month>6</month>
+          <year>2022</year>
+        </date>
+        <date date-type="revised">
+          <day>25</day>
+          <month>10</month>
+          <year>2022</year>
+        </date>
+      </history>
+      <abstract>
+        <p>Moonlighting proteins are multifunctional, singlepolypeptide chains capable of performing multiple autonomous functions. Most moonlighting proteins have been discovered through work unrelated to their multifunctionality. We believe that prediction of moonlighting proteins from first principles, that is, using sequence, predicted structure, evolutionary profiles, and global gene expression profiles, for only one functional class of proteins in a single organism at a time will significantly advance our understanding of multifunctional proteins. In this work, we investigated human moonlighting DNA-binding proteins (mDBPs) in terms of properties that distinguish them from other (non-moonlighting) proteins with the same DNA-binding protein (DBP) function. Following a careful and comprehensive analysis of discriminatory features, a machine learning model was developed to assess the predictability of mDBPs from other DBPs (oDBPs). We observed that mDBPs can be discriminated from oDBPs with high accuracy of 74% AUC of ROC using these first principles features. A number of novel predicted mDBPs were found to have literature support for their being moonlighting and others are proposed as candidates, for which the moonlighting function is currently unknown. We believe that this work will help in deciphering and annotating novel moonlighting DBPs and scale up other functions. The source codes and data sets used for this work are freely available at https://zenodo.org/record/7299265#.Y2pO3ctBxPY</p>
+      </abstract>
+    </article-meta>
+  </front>
+  <body>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_2_1.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_4_1.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_1.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_2.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_3.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_4.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_5.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_6.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_7.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_8.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_9.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_10.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_11.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_12.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_13.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_14.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_15.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_16.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_17.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_18.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_19.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_20.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_21.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_22.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_23.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_24.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_25.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_26.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_27.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_28.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_29.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_30.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_31.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_32.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_33.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_34.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_35.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_36.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_37.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_38.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_39.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_40.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_41.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_42.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_43.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_44.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\Predictive modeling.images\img_6_45.png" />
+    </fig>
+    <sec id="sec-1">
+      <title>-</title>
+      <p>1,*</p>
+    </sec>
+    <sec id="sec-2">
+      <title>INTRODUCTION</title>
+      <p>
+        The human genome encodes close to 20,000 protein-coding
+genes, which is clearly a small number when compared with
+the complexity and diversity of biological functions (
+        <xref ref-type="bibr" rid="ref1">1</xref>
+        ).
+Several combinatorial and versatile approaches are employed
+by proteins to perform the huge number of molecular
+functions involved in the human lifecycle. One such
+mechanism, called moonlighting has drawn the attention of the
+community (
+        <xref ref-type="bibr" rid="ref2 ref3 ref4 ref5">2–5</xref>
+        ). Moonlighting proteins are a subset of
+multitasking proteins. However, unlike many other
+multitasking proteins, the moonlighting function is not encoded
+in different functional or structural domains. They switch
+between their moonlighting functions by partnering with
+different sets of substrates, using different oligomerization
+states, post-translational modifications or as a response to
+changes in the physio-chemical environment or subcellular
+localization (
+        <xref ref-type="bibr" rid="ref4 ref6 ref7 ref8 ref9">4,6–9</xref>
+        ). Different micro-mechanisms adopted
+by moonlighting proteins to perform multiple functions are
+illustrated in Figure 1. Moonlighting functions of the same
+protein might be spatially or temporally differentiated, i.e.
+different moonlighting functions may be associated with
+different cellular localization of DBPs or they may perform
+their moonlighting functions under different cellular
+conditions at different time points. Indeed change in cellular
+localization is well-known to be a driving force for
+moonlighting (
+        <xref ref-type="bibr" rid="ref10">10</xref>
+        ). To accomplish this functional pattern in a cell,
+the levels, locations, and contexts of gene expression are
+controlled. For example, crystallins are produced in a
+variety of tissues, where they perform their canonical function.
+In some vertebrates, they have been shown to express at a
+higher level in the eye lens, induced by some transcription
+factors where they serve an additional moonlighting
+function as a structural protein (
+        <xref ref-type="bibr" rid="ref11 ref12 ref13 ref8">8,11–13</xref>
+        ). Heat shock protein
+Hsp90 has been identified as a secreted, cell surface, and
+nuclear protein. Whereas normally molecular chaperons
+perform their canonical cytoplasmic functions assisting
+protein folding (
+        <xref ref-type="bibr" rid="ref14">14</xref>
+        ), and inside the nucleus regulating nuclear
+functions (
+        <xref ref-type="bibr" rid="ref15">15</xref>
+        ), when secreted, Hsp90 has pro-tumorigenic
+properties (
+        <xref ref-type="bibr" rid="ref16 ref17">16,17</xref>
+        ). Most such moonlighting functions are
+organism specific, emphasizing the usefulness of a
+predictive model that focuses on a single species.
+      </p>
+      <p>
+        The discovery of moonlighting proteins has mostly
+been serendipitous. Researchers have focused on
+literature mining, Gene ontology (GO) mining, and other
+methods to label proteins as moonlighting in the first
+place. As a result, several databases of moonlighting
+proteins have been reported. Prominent among them are
+Moonprot3.0, which includes expert-curated protein (
+        <xref ref-type="bibr" rid="ref18">18</xref>
+        ),
+MoonDB 2.0 comprising of predicted and manually
+curated extreme multifunctional and moonlighting proteins
+(
+        <xref ref-type="bibr" rid="ref19">19</xref>
+        ) and MultitaskProtDB-II with curated moonlighting
+proteins (
+        <xref ref-type="bibr" rid="ref20">20</xref>
+        ). At least one study (PlantMP) has reported the
+manual curation of a species-oriented database of
+moonlighting proteins by experts (
+        <xref ref-type="bibr" rid="ref21">21</xref>
+        ).
+      </p>
+      <p>
+        Three major strategies have been adopted so far for
+identifying novel moonlighting proteins. The first identifies
+them using pre-existing annotations such as Gene Ontology
+and text mining. Computational methods that used this
+approach include MoonGO which identifies overlapping
+clusters in protein–protein interaction networks using
+overlapping cluster generator algorithm and combines it with Gene
+Ontology to identify candidate moonlighting proteins as
+a subclass of extreme multifunctional proteins (
+        <xref ref-type="bibr" rid="ref22 ref23">22,23</xref>
+        ) and
+DextMP which applied natural language processing to
+identify moonlighting proteins based on published literature
+(
+        <xref ref-type="bibr" rid="ref24">24</xref>
+        ). The second strategy, which goes beyond the
+compilation of moonlighting proteins from the literature and from
+ontology trees, attempts direct annotation of the
+moonlighting function (
+        <xref ref-type="bibr" rid="ref25 ref26">25,26</xref>
+        ). In general, sequence-based
+functional annotation has often been based on detection and
+identification of homologous, conserved motifs /domains.
+However, such an approach is difficult to apply to
+moonlighting proteins because the functional signatures for one
+of the functions may be too weak and camouflaged by the
+other well known function (
+        <xref ref-type="bibr" rid="ref25 ref27">25,27</xref>
+        ). Therefore, studies of
+sequence-based moonlighting annotations have attempted
+to exploit methods for detecting remote homologies. For
+example, Gomez et al. examined eleven approaches and
+determined that PSI-BLAST (
+        <xref ref-type="bibr" rid="ref28">28</xref>
+        ) performed relatively well at
+identifying moonlighting functions (
+        <xref ref-type="bibr" rid="ref29">29</xref>
+        ). Khan et al.
+compared protein function prediction (PFP) and extended
+similarity group (ESG) to PSI-BLAST and discovered that PFP,
+which derives functional information from weakly related
+sequences, was the most accurate in predicting the
+alternative functions of moonlighting proteins (
+        <xref ref-type="bibr" rid="ref26">26</xref>
+        ). Both studies
+suggest that non-canonical functions may be observed in
+distantly related sequences even when close homologies are
+absent. Gomez et al in 2011 confirmed that protein–protein
+interaction databases do indeed reveal moonlighting
+proteins and suggested that PPI databases might be beneficial
+for indicating multifunctionality (
+        <xref ref-type="bibr" rid="ref22 ref30">22,30</xref>
+        ). Hernandez et al.
+examined a collection of moonlighting proteins to
+determine if they are inherently disordered proteins since the
+latter easily fold into multiple conformations that could help
+perform multiple functions (
+        <xref ref-type="bibr" rid="ref4">4</xref>
+        ). However, their findings
+suggested that the majority of moonlighting proteins are not
+fundamentally disordered proteins. (
+        <xref ref-type="bibr" rid="ref31">31</xref>
+        ). Hernandaz et al.
+used PSI-BLAST to identify 42% of the 288
+moonlighting proteins in MultitaskProtDB, whereas only 8% were
+detected by both PSI-BLAST and InterPro (
+        <xref ref-type="bibr" rid="ref27">27</xref>
+        ). Algorithms
+such as PSI-BLAST, PFP and ESG identify distant
+homologs by matching stretches of amino acid residues from
+distinct domains to regions of a probable moonlighting
+protein. These searches generate a significant number of hits,
+from which the real positives must be extracted.
+Hernandez et al. discovered that when PSI-BLAST is paired with
+PPI, the best performance is obtained. Additionally,
+structural information and mutation correlation analysis may be
+used to further narrow the field (
+        <xref ref-type="bibr" rid="ref25">25</xref>
+        ). Finally, the third
+strategy to identify novel moonlighting functions aims to predict
+them using directly computed features, odelled with
+machine learning. Among them, MPFit employs many
+omicsbased characteristics such as protein–protein interaction,
+gene expression, phylogenetic profiles, genetic relationships,
+network-based graph properties, and disordered protein
+regions, as well as the option to include or exclude Gene
+Ontology (
+        <xref ref-type="bibr" rid="ref32">32</xref>
+        ). IdentPMP tries to identify plant-only
+moonlighting proteins based on amino acid composition and
+content predicted using iLearn (
+        <xref ref-type="bibr" rid="ref33">33</xref>
+        ). MEL-MP attempts to
+predict proteins based on primary protein sequence
+information, evolutionary information, physical chemical
+properties and secondary structural features of the proteins (
+        <xref ref-type="bibr" rid="ref34">34</xref>
+        ).
+Shirafkhan et al. developed a method to predict
+moonlighting proteins based on 37 different feature vectors derived
+from amino acid sequences (
+        <xref ref-type="bibr" rid="ref35">35</xref>
+        ).
+      </p>
+      <p>While these methods have shown a varied degree of
+predictive performance, they suffer from the fact that they treat
+moonlighting function as a single property without
+identifying specific roles of these features in moonlighting
+proteins of a special functional class with common functions.
+Such methods may have a tendency to exaggerate predictive
+performance due to the very general nature of the control
+data sets. We argue that studying moonlighting behavior
+for specific functional group of proteins in a specific
+organism will provide further clues into functional co-occurrences
+and help in predicting them more accurately without
+overestimating predictive accuracy. Thus, we selected one of the
+most widely investigated functional class of proteins, the
+human DNA-binding proteins (DBPs) and created a database
+of human moonlighting versus other DBPs (mDBPs versus
+oDBPs). Using these data sets and their sequence,
+structural, evolutionary, PPI network and gene expression
+features, we evaluated the extent to which such rigorously
+compiled groups can be discriminated from one another. Our
+results indicate that using strict controls of oDBP against
+mDBPs, ML models could be trained to test data AUC of
+ROC up to 74%. Proteins that were consistently predicted
+to be mDBPs are proposed to be candidate DBPs that
+possibly perform currently unknown moonlighting functions.</p>
+    </sec>
+    <sec id="sec-3">
+      <title>MATERIALS AND METHODS</title>
+      <sec id="sec-3-1">
+        <title>Data preparation</title>
+        <p>Data sets are crucial for any predictive modeling, and
+updated data sets can improve predictability. However,
+labeling proteins as moonlighting through a manual
+curation process is a laborious job, partly because annotation
+of moonlighting is not reported with the corresponding
+searchable keyword. One needs to carry out substantial
+literature search to dig out the multifunctionality of proteins
+and then look at the sequence, structure and domain
+information to unambiguously annotate them as moonlighting.
+Numerous groups have systematically pursued database
+development, which is of a sufficiently good quality to develop
+trainable models. We have therefore used publicly
+available moonlighting databases for the current annotations
+of moonlighting proteins as described in the following
+sections. From the predictive models, candidate novel
+moonlighting proteins are proposed if they have multiple
+functions without a separate functional domain associated to
+each one of them. Detailed procedures involved in
+preparing training data sets are explained below.</p>
+      </sec>
+      <sec id="sec-3-2">
+        <title>Moonlighting DNA binding proteins (mDBPs)</title>
+        <p>
+          Figure 2 depicts a flowchart of the steps involved in
+preparing the dataset of mDBPs. As illustrated, we have
+currently focused on human moonlighting DNA binding
+proteins. Moonlighting annotations in our work have been
+taken from Moonprot 3.0 (
+          <xref ref-type="bibr" rid="ref18">18</xref>
+          ), MultitaskProtDB-II (
+          <xref ref-type="bibr" rid="ref20">20</xref>
+          )
+and MoonDB 2.0 (
+          <xref ref-type="bibr" rid="ref19">19</xref>
+          ). However, DBP functions are not
+clearly annotated in these data sets. Therefore, we used a
+database of DNA-binding proteins in humans and their
+corresponding gene expression profiles from our previously
+published work with a database called GIGEASA (
+          <xref ref-type="bibr" rid="ref36">36</xref>
+          ). To
+combine the two complementary annotations, a list of
+compiled moonlighting proteins were compared to a list of 2407
+DNA binding proteins listed in GIGEASA datasets (
+          <xref ref-type="bibr" rid="ref36">36</xref>
+          ).
+This resulted in the annotations of 46 mDBPs. A further set
+of filters was applied to exclude sequences whose
+similarity is higher than 25%, proteins having domains related to a
+secondary function documented in the literature, and those
+lacking a direct DNA binding annotation. This resulted
+in 29 high confidence non-redundant mDBPs as shown in
+Supplementary Table ST1.
+        </p>
+      </sec>
+      <sec id="sec-3-3">
+        <title>Other (non-moonlighting) DNA binding proteins (oDBPs)</title>
+        <p>We focus on proteins with common DBP function and
+characterize how an additional moonlighting function can be
+predicted for them. To compile control data of DBPs with
+no moonlighting function, we restarted from the list of 2407
+DNA binding proteins from GIGEASA dataset and filtered
+out 46 moonlighting proteins and their known homologs.
+This resulted in 647 proteins, which we re-clustered at 25%
+sequence identity, removing three redundant proteins. An
+additional protein was removed due to failure in extracting
+all features analyzed in this work. This final list of 643
+nonmoonlighting (other) DNA binding proteins (oDBPs) were
+used as a control data of DBPs against mDBPs
+(Supplementary Table ST1).</p>
+      </sec>
+      <sec id="sec-3-4">
+        <title>Feature sets covered</title>
+        <p>We identified different feature sets of moonlighting
+functions that were studied and reviewed earlier by several
+groups. In this work, we used vfie types of feature sets
+related to the protein sequence, structure, or gene-level
+expression profiles. These include (i) single protein
+sequence and predicted binding site features, (ii)
+sequencebased evolutionary features, (iii) network features based on
+protein–protein interactions, (iv) sequence-predicted
+secondary structural features and (v) global gene expression
+profiles. Computation of each of these features was carried
+out as follows.</p>
+      </sec>
+      <sec id="sec-3-5">
+        <title>Single protein sequence and predicted binding site features</title>
+        <p>
+          Single sequence features are represented by the amino acid
+composition of each protein, and their sequence-predicted
+binding sites features, taken from our previously published
+work (
+          <xref ref-type="bibr" rid="ref37">37</xref>
+          ). These so-called GIGEASA dataset features
+consist of the binding site prediction scores for carbohydrates,
+DNA, RNA, adenosine triphosphate (ATP), and protein
+binding sites, as well as the amino acid composition and
+length of the proteins (
+          <xref ref-type="bibr" rid="ref36">36</xref>
+          ). These features can be readily
+used for protein-level predictions in a function prediction
+program. Since the binding sites are predicted at the whole
+sequence level, their protein-level summaries are generated
+by protein-wise averages, quantiles and other representative
+scores as used in our previous work (
+          <xref ref-type="bibr" rid="ref36">36</xref>
+          ).
+        </p>
+      </sec>
+      <sec id="sec-3-6">
+        <title>Gene expression features</title>
+        <p>In our previous work, we have integrated gene expression
+profiles from the entire Affymetrix platform GPL570,
+representing &gt;70 000 experiments. A single gene has been
+represented by the frequency of its occurrence in each of the
+20 pre-defined bins of expression values. Frequencies of
+experiments (samples) in each bin is used as a 20-dimensional
+gene expression feature of each protein mapped to a
+specific gene in the database. Co-expression of a single gene
+with others is also vectorized in the same way. The gene
+expression and co-expression profiles that were binned into 20
+equal-probability bins in the GIGEASA dataset were
+further coarse-grained to 5 bins to increase bin-wise occupancy
+of proteins. Coarse-graining was performed by pooling
+together every 4 successive bins starting from the first to make
+a new bin.</p>
+      </sec>
+      <sec id="sec-3-7">
+        <title>Evolutionary features</title>
+        <p>
+          Position specific scoring matrix (PSSM) (
+          <xref ref-type="bibr" rid="ref28">28</xref>
+          ) profiles for the
+672 proteins were generated using PSI-BLAST with default
+parameters for three iterations against the NR database
+downloaded from NCBI. The log-odds score from the
+resulting profiles were taken and two types of PSSM features
+were generated for each protein; that is, the average of the
+log odds value for all the amino acids were taken and the
+average of the log odds value for each of the 20 amino acids
+separately (leading to 20 × 20 = 400 features). The
+concatenated feature values of 400 + 20 features were used as inputs
+for PSSM-based predictions.
+        </p>
+      </sec>
+      <sec id="sec-3-8">
+        <title>Predicted structural features</title>
+        <p>
+          We predicted the secondary structure features (alpha
+helix, strand, coil), solvent accessibility (buried, exposed and
+moderate) and disorder (disordered or ordered) for each
+protein using a local copy of Raptor X (
+          <xref ref-type="bibr" rid="ref38">38</xref>
+          ). Raptor X gives
+both 3-state and 8-state secondary structure predictions of
+which we used 3-state secondary structure helix, beta-sheet,
+and loop to enable enough feature value diversity in each.
+The solvent accessibility of residues was predicted using 2
+cutoffs for the three states. Those below 10% accessibility
+are predicted to be buried while those above 42% are
+considered as exposed and those between 10% and 42% are
+predicted to be moderate. Raptor X also gives an order or
+disorder prediction score at the residue level based on the
+probability of the residue to be in an ordered segment or not.
+        </p>
+      </sec>
+      <sec id="sec-3-9">
+        <title>PPI-network features</title>
+        <p>
+          A protein–protein interaction (PPI) network represents all
+known protein interactions. When utilized with the
+functional annotation of the component proteins, they can aid
+in the discovery of moonlighting proteins, like MoonGO
+and OCG do (
+          <xref ref-type="bibr" rid="ref22 ref23">22,23</xref>
+          ). In our work, protein–protein
+interaction network features like the number of pathways that
+the protein is involved in and a binary representation of
+whether the protein is a hub or bottleneck extracted from
+Targetmine (
+          <xref ref-type="bibr" rid="ref39">39</xref>
+          ) are primary network features investigated
+for their ability to predict moonlighting.
+        </p>
+      </sec>
+      <sec id="sec-3-10">
+        <title>Model selection</title>
+        <p>
+          Based on each feature set and their combination, a
+machine learning classifier was trained using an
+arbitrarily selected set of potential computational models. Each
+model attempts to predict class labels (mDBP or oDBP) by
+employing selected feature sets using leave-one-out
+crossvalidation. Five different Machine learning algorithms, i.e.
+Random Forest (RF) (
+          <xref ref-type="bibr" rid="ref40">40</xref>
+          ), Balanced Random Forest (BRF)
+(
+          <xref ref-type="bibr" rid="ref41">41</xref>
+          ), Catboost (
+          <xref ref-type="bibr" rid="ref42">42</xref>
+          ), XGBoost (
+          <xref ref-type="bibr" rid="ref43 ref44">43,44</xref>
+          ) , and LightGBM (
+          <xref ref-type="bibr" rid="ref45">45</xref>
+          )
+were compared. Catboost was the best performing model
+and was used for developing the final prediction model.
+Catboost is a gradient boosting decision tree-based algorithm
+which is good for dealing with categorical data because of
+the way it handles encoding and being less prone to
+overiftting, this model has become a preferred ML method for
+large data sets. It uses ordered boosting which makes sure
+that it does not evaluate a candidate tree with the examples
+it has used to build the tree, and eventually uses all the
+examples (
+          <xref ref-type="bibr" rid="ref42">42</xref>
+          ). Additionally, the performance of each feature
+set and combination of extracted features was examined.
+To deal with imbalanced data, classifier model overweights
+the minority class during training. Thus, Catboost classifier
+with auto class weights = ‘Balanced’ was used. This
+automatically calculates class weights either on the total weight
+or the total number of objects in each class. The values are
+used as multipliers for the object weights.
+        </p>
+      </sec>
+    </sec>
+    <sec id="sec-4">
+      <title>RESULTS AND DISCUSSIONS</title>
+      <p>To assess if we can predict novel mDBPs directly from their
+computable features, we first examined the statistical
+distribution of representative feature sets and assessed how these
+features individually discriminate mDBPs from oDBPs. A
+binary classifier was then trained so that the cumulative
+impact of discriminatory features can be captured,
+prediction performance be evaluated and some candidate novel
+mDBPs could be proposed. Results of these analyses are
+presented below.</p>
+      <sec id="sec-4-1">
+        <title>Discriminatory features of moonlighting function in DBPs</title>
+        <p>We used vfie different groups of features for their potential
+to distinguish between mDBPs and oDBPs. Most
+considered feature sets have been compared in Figure 3A–F with
+additional details in Supplementary Table ST2 (explained
+below). Complete set of p-values for all the considered
+features are provided in Supplementary Table ST3.
+Investigation of most discriminatory members of each feature set are
+discussed in the following.</p>
+      </sec>
+      <sec id="sec-4-2">
+        <title>Single sequence and predicted binding site differences between mDBPs and oDBPs:</title>
+        <p>
+          Sequence features, including binding site predictions for
+DNA, RNA, ATP and carbohydrates were used as in our
+earlier works (
+          <xref ref-type="bibr" rid="ref36">36</xref>
+          ). CountX represents the frequency of
+occurrence of residue X in the protein sequence. For example,
+countS and countV represent the counts of the amino acids
+serine and valine. The top25ppi, top25dna, top25rna and
+top25carb represents the top 25 predicted binding scores
+for protein–protein interactions, DNA, RNA, and
+carbohydrate binding computed for each residue. Similarly, for top5
+and top10, q3ppi shows the quartile 3 of the predictions of
+protein–protein interaction sites. In Figure 3A, the 20
+statistically most significant attributes amongst these features
+have been displayed. In addition, Figure 3B shows that the
+frequency of the number of pathways that a protein is
+involved in, and the nature of the topological positioning of
+the protein in the network like bottlenecks or hub proteins
+are linked to mDBPs versus oDBPs. From these Figure 3A
+and B, it become evident that the frequencies of Serine,
+Valine and Histidine are most significantly different between
+the two classes of proteins and these residues may play a role
+in allowing multiple functions. Among the binding site
+prediction scores, protein–protein interaction sites are found to
+be the most significant discriminatory features. The ability
+of sequence-predicted PPIs to discriminate between mDBPs
+and oDBPs is a novel result from the current work that
+supports these previous observations and may be useful in
+identifying moonlighting proteins other than DBPs.
+        </p>
+      </sec>
+      <sec id="sec-4-3">
+        <title>Moonlighting and evolutionary profiles</title>
+        <p>
+          Evolutionary profiles of proteins represented by their
+position-specific substitution matrices (PSSMs) have been
+widely used to annotate proteins, including DBPs and their
+binding sites (
+          <xref ref-type="bibr" rid="ref46 ref47 ref48">46–48</xref>
+          ). It is not obvious at the outset if they
+will also have different patterns in mDBPs versus oDBPs.
+Since the PSSMs of proteins are of different sizes, a
+summary of PSSM is typically used as a feature for predictive
+models. Consistent with that practice we computed 20
+overall and then 20 × 20 amino-acid wise column averages of
+PSSMs as protein features as described in the Methods (
+          <xref ref-type="bibr" rid="ref46">46</xref>
+          )
+and performed a t-test of significance between mDBP and
+oDBPs (see Figure 3C). We do observe that many
+evolutionary features from the 20 × 20 representation of amino
+acid pairs are significantly different between mDBPs and
+oDBPs. Complete results are shown in Supplementary
+Table ST2. Specifically, the average log odd score of Ser in Pro
+columns and average Ala log odd scores in Val columns are
+found to have the highest significance. Among the overall
+column averages, Tyr was found to be the most significant
+residue column among all 20 amino acids. Other pairs such
+as Tyr in the Trp column, Asp in the Glu column and Cys in
+the Val column are the top residues in evolutionary profiles
+which distinguish between mDBPs and oDBPs.
+        </p>
+      </sec>
+      <sec id="sec-4-4">
+        <title>Predicted structural features</title>
+        <p>
+          Sequence-predicted structural features have been shown to
+improve protein function prediction (
+          <xref ref-type="bibr" rid="ref49 ref50 ref51 ref52 ref53">49–53</xref>
+          ). We predicted
+some structural properties of mDBPs and oDBPs and
+compared their average values in the two groups. Figure 3D
+presents the results of this analysis. We observe that the
+average number of predicted strands is higher in mDBPs than
+oDBPs. DNA-binding proteins primarily interact through
+their recognition helices and hence the presence of a higher
+number of strands may itself be an indication of
+moonlighting function. One might wonder that keeping the helical
+interfaces intact for DNA-binding activity, additional strands
+are only used for moonlighting function. To examine this,
+we did compare the sizes of the mDBPS and oDBPs
+together with their strand counts (supplementary table ST1).
+We observed that even though the strands count on the
+whole is higher in mDBPs, it does not appear to be driven
+by protein sizes, as there was no sigjificant difference
+between the lengths of mDBPs and oDBPs. One might
+speculate that actual DNA interface is also composed of strands
+in moonlighting proteins. However, in the absence of
+complete protein-DNA complex structures with moonlighting
+substrates, drawing a general rule is difficult at this stage.
+        </p>
+        <p>Finally, the number of residues in the intermediate
+solvent accessibility range is higher in moonlighting proteins.
+This observation is interesting as a partially exposed
+surface area in these residues may allow them to switch from
+exposed to buried states quickly, enabling moonlighting. It
+would also be of interest in the future to explore if the
+presence of partially exposed residues is a general property of all
+moonlighting proteins or specific to moonlighting DBPs.</p>
+      </sec>
+      <sec id="sec-4-5">
+        <title>Gene expression features of mDBPs versus oDBPs</title>
+        <p>
+          In our previous works, we showed that global gene
+expression profiles collected from &gt;70 000 experiments can be
+used to improve the predictability of DNA-binding
+proteins, particularly those which have weak sequence level
+binding scores in prediction models (
+          <xref ref-type="bibr" rid="ref36">36</xref>
+          ). These gene
+expression profiles are actually the relative number of experiments
+for which a corresponding gene was found to have an
+expression value represented by an expression value range or
+bin. Similarly, co-expression profile is the number of times
+a gene had its co-expression (Pearson’s correlation) value
+within the range represented by the corresponding range
+or bin, counted for all gene pairs involving that gene. In
+our previous work, we used 20 bins to represent expression
+values and separately, the co-expression of a gene paired
+with all other genes. In this work, the 20-bins were further
+coarse-grained into 5 bins to enable more data in each bin
+for the small sample size here. After merging the bins as
+described in Methods, we could determine the relative
+number of times a mDBP shows expression values in the range
+represented by each bin and compare it with the frequencies
+observed in oDBPs. Figure 3E-F shows the results from this
+analysis. The bins from the normalized expression values
+are represented by bin1, bin2 upto bin5 and those based on
+co-expression are binc1, binc2, onwards. We observe that
+absolute expression values distribution of gene expression
+remains predictive of mDBPs to some extent as the number
+of times the two frequencies differ in mDBPs from oDBPs is
+statistically significant. Thus, the results indicate that
+moonlighting proteins express at relatively higher level than their
+non-moonlighting counterparts, thereby increasing the
+frequency in bin5 at the cost other bins. Although, we do see
+some differences in the co-expression profiles as well, none
+of the individual frequencies in each bin was observed to be
+statistically significant. It is however possible that the
+different weak features are collectively predictive of mDBPs, an
+issue that we will look into in the next section on classifier
+performances.
+        </p>
+      </sec>
+      <sec id="sec-4-6">
+        <title>Classification model for mDBP versus oDBPs</title>
+        <p>In the above sections, we investigated individual features of
+mDBPs which might distinguish them from oDBPs.
+However, many of these individual features may have a synergetic
+effect and the same can be captured by developing
+predictive models using each feature set as input and then
+combining and assessing the predictive performance by
+comparisons. We would also like to assess if the available
+methods of predictive moonlighting proteins are outperformed
+by the proposed exclusive mDBP de novo prediction.
+Several methods for predicting moonlighting for proteins are
+available with varied claims of performance. For example,
+DextMP, IdentPMP, MEL-MP and an unnamed method
+by Zahiri et al. reported AUC values of 80% and 90%.
+MPFIT, on the other hand, reported 98% accuracy. However,
+all these methods are general in nature and their
+applicability to a specific group of proteins such as mDBPs was
+unclear. Only MPFit’s source codes were available for the
+prediction of moonlighting proteins using the non-redundant
+DNA binding dataset that was compiled. MEL-MP could
+also be used to fetch a list of predicted mDBPs. Thus, we
+tested the performances of these two groups of methods for
+predicting mDBPs from oDBPs. We used three variants of
+MPFIT and MEL-MP to evaluate if general moonlighting
+prediction methods can also pick the moonlighting DBPs
+(See Table 1). We observed that these available methods
+could only reach an AUC of ROC close to 62% in predicting
+mDBPs from oDBPs, making the development of a novel
+method even more important.</p>
+        <p>The comparison of prediction performance with available
+published methods is provided only to explain that a
+focused study of single biological function can help in
+improving moonlighting in that class of proteins. We do not suggest
+that first principles method of predicting moonlighting
+proteins is better than published works when it comes to overall
+prediction of moonlighting, which we have deliberately not
+attempted in view of the scope of this work.</p>
+        <p>
+          To use a first principles method to predict mDBPs based
+on the feature sets investigated above, we trained the mDBP
+versus oDBP data sets analyzed above using the catboost
+approach. (catboost was found the most suitable among the
+models tested on random samples; data not shown). These
+results could be further improved by running catboost
+multiple (
+          <xref ref-type="bibr" rid="ref10">10</xref>
+          ) times and averaging the predictions from the
+ensemble of these models. Results from all these experiments
+under leave-one-out cross-validation training are presented
+in a section of Table 1. Additional details are shown in ROC
+and PR curves in supplementary figures SF1 and SF2.
+        </p>
+      </sec>
+      <sec id="sec-4-7">
+        <title>Predictability of mDBPs from individual and cumulative feature sets</title>
+        <p>The second section of Table 1 shows that protein–protein
+interaction network-based features were able to better
+differentiate between moonlighting and non-moonlighting DNA
+binding proteins with a performance of 72% AUC of ROC
+with the best precision and recall. The combination of all
+features reduced the performance to AUC of ROC 69%,
+presumably due to over-fitting and an increase in
+dimensionality. Since the feature sets were not additive in their
+prediction performance, we performed ensemble methods to
+predict moonlighting proteins from their prediction scores
+as well as labels. The nfial performance was 74%.</p>
+        <p>The performance of our current model was then
+compared with other prediction models developed for the
+prediction of moonlighting proteins.</p>
+      </sec>
+      <sec id="sec-4-8">
+        <title>Candidate novel moonlight DBPs</title>
+        <p>
+          Combining all feature sets into an ensemble model, we
+observed an AUC of ROC at 74% in our data sets.
+However, false positives with high prediction scores could still be
+candidate novel mDBPS whose moonlighting has yet not
+been established. Thus, we provide the database of all
+final predicted scores for all the DBPs in our database
+(Supplementary Table ST4). From this table, we compiled a list
+of top scoring false positive oDBPs and searched the
+literature for their support as candidate novel mDBPs (see
+Table 2). We found that 10 out of 53 top false positives
+from our predictions had literature support. For example,
+a false positive mDBP in Table 2, Cyclin-dependent
+kinase 9 (Cdk9) is a subunit of the positive transcription
+elongation factor b (P-TEFb), which promotes the
+elongation of pre-mRNA. Although a kinase per say, it has been
+suggested that CDK9 responds to replication stress by
+localizing to chromatin to reduce the breakdown of stalled
+replication forks and promote recovery from replication
+arrest (
+          <xref ref-type="bibr" rid="ref54">54</xref>
+          ). It likely binds to promoter regions of certain
+transcription factors in cardiac muscles (https://zfin.org/
+ZDB-GENE-030131-321). Through an unknown
+mechanism, Cdk9 complexes with cyclin K, Atrip, Atr, and claspin
+proteins, thereby regulating single-stranded DNA
+interaction with replication protein A, ensuring the stability of the
+replication fork (
+          <xref ref-type="bibr" rid="ref55">55</xref>
+          ). Loss of Cdk 9-cyclin K complex
+activity increases DNA damage signaling in replicating cells
+with a diminished capacity to recover from replication
+arrest (
+          <xref ref-type="bibr" rid="ref55 ref56">55,56</xref>
+          ).
+        </p>
+        <p>Another example in the candidate list corresponds to
+Inosine-5 -monophosphate dehydrogenase 2 (IMPDH2).
+This protein has been known for enzymatic activity before
+being established as a transcription factor. Somehow, the
+protein has not been included in the current updates of
+moonlighting databases</p>
+        <p>
+          Another protein, FOS, has been already reported to be
+involved in lipid synthesis in neurons and based on that can
+be annotated as moonlighting (
+          <xref ref-type="bibr" rid="ref57">57</xref>
+          ). Somehow, this
+annotation has escaped from the current versions of moonlighting
+databases and our method was able to recover its
+annotation as mDBP. Similarly, we found moonlighting support
+for another DBP called NRF-1. NRF-1 is a transcription
+factor which has been reported to perform a role in neurite
+growth as well as lipid homeostasis (
+          <xref ref-type="bibr" rid="ref58 ref59">58,59</xref>
+          ).
+        </p>
+        <p>
+          Yet another candidate mDBP in Table 2, mitochondrial
+superoxide dismutase 2 (SOD2) protein, is an enzyme that
+primarily accelerates the dismutation of O2. However,
+further increases in SOD2 expression was reported to worsen
+oxidative stress, suggesting that SOD2 may play a
+prooxidant role (
+          <xref ref-type="bibr" rid="ref60">60</xref>
+          ). Also, SOD2, which normally binds
+manganese, can also contain iron, and generate a
+peroxidaseactive isoform, further supporting its moonlighting
+function.
+        </p>
+        <p>Overall, we found support for 10 out of 53 proteins in
+Table 2 for being moonlighting. These include PC, ABI2,
+RPS27, PARK7, and EEF1D in addition to the vfie specific
+cases (CDK9, IMPDH2, FOS, NRF-1 and SOD2) above.
+Thus, we believe there may be more mDBPs in the list of
+false positives in Table 2, whose moonlighting behavior may
+be established in the future.</p>
+      </sec>
+      <sec id="sec-4-9">
+        <title>Cellular localization and moonlighting</title>
+        <p>
+          Many moonlighting proteins perform their alternative
+functions through cellular localization. For example, a DBP
+which is a trans-membrane protein must translocate to the
+nucleus to act as a transcription factor. However, even if
+cellular localization is the primary driver of moonlighting, the
+protein needs to be transported to different locations, which
+is why many proteins contain a localization signal sequence
+and indeed importance of short sequence motifs has been
+documented (
+          <xref ref-type="bibr" rid="ref23 ref61 ref62">23,61–62</xref>
+          ). Yet, several proteins localize to
+different cellular compartments even when they do not have a
+detectable motif towards and hence the absence of a motif
+does not imply that a protein does not have a sequence or
+structure level signal. There are multiple publications which
+rely on sequence features for the prediction of cellular
+localization of proteins. For example, WoLF PSORT, YLoc,
+TargetP and TMHMM (
+          <xref ref-type="bibr" rid="ref63 ref64 ref65 ref66">63–66</xref>
+          ) have predicted the cellular
+localization of proteins with as high as 80% accuracy from
+sequence information. Thus, cellular localization
+information appears implicitly contained in the sequence and
+structural properties of the proteins and our method essentially
+tries to capture that indirect relationship.
+        </p>
+        <p>
+          In order to understand the relationship between
+cellular localization and moonlighting in detail, we extensively
+examined the predictability of mDBPs from available
+cellular localization annotations. We used the ‘Compartment
+database’ of cellular localization (
+          <xref ref-type="bibr" rid="ref67">67</xref>
+          ) and tried to develop a
+prediction model for moonlighting proteins only from
+compartment prediction. We did observe that cellular
+compartment annotation alone was able to predict moonlighting
+DBP function with 86% accuracy, much better than the first
+principles method proposed in this work. However, it also
+indicates that most of the current annotations of
+moonlighting proteins are based on their known cellular localization
+or their well-studied functions. This approach is good to
+mine for moonlighting proteins that are already noted by
+different names or under different contexts. However, they
+cannot predict novel moonlighting proteins in the way a
+ifrst principles approach like the one proposed here could
+Uniprot
+ID
+P35249
+Q16531
+P41221
+Q9NYA1
+P08047
+O14744
+P15927
+P11387
+P18848
+Q6ZYL4
+P56282
+Q9NYB9
+Q14814
+P49005
+P01100
+O60907
+P30876
+Q96T60
+Q00403
+P19388
+P30044
+O60869
+P62841
+P19838
+P04179
+P05067
+        </p>
+        <p>Gene
+HGNC
+code
+RFC4
+DDB1
+WNT5A
+SPHK1
+SP1
+PRMT5
+RPA2
+TOP1
+ATF4
+GTF2H5
+POLE2
+ABI2
+MEF2D
+POLD2
+FOS
+TBL1X
+POLR2B
+PNKP
+GTF2B
+POLR2E
+PRDX5
+EDF1
+RPS15
+NFKB1
+SOD2
+APP</p>
+        <p>Name of the protein
+Replication factor C subunit 4
+DNA damage-binding protein 1
+Protein Wnt-5a
+Sphingosine kinase 1
+Transcription factor Sp1
+Protein arginine N-methyltransferase 5
+Replication protein A 32 kDa subunit
+DNA topoisomerase 1
+Cyclic AMP-dependent transcription
+factor ATF-4
+General transcription factor IIH
+subunit 5
+DNA polymerase epsilon subunit 2
+Abl interactor 2
+Myocyte-specific enhancer factor 2D
+DNA polymerase delta subunit 2
+Protein c-Fos
+F-box-like/WD repeat-containing
+protein TBL1X
+DNA-directed RNA polymerase II
+subunit RPB2
+Bifunctional polynucleotide
+phosphatase/kinase
+Transcription initiation factor IIB
+DNA-directed RNA polymerases I, II,
+and III subunit RPABC1
+Peroxiredoxin-5, mitochondrial
+Endothelial differentiation-related
+factor 1
+40S ribosomal protein S15
+Nuclear factor NF-kappa-B p105
+subunit
+Superoxide dismutase
+Amyloid-beta precursor protein
+do. Nor do they provide insights into the mechanistic
+basis of moonlighting. Further, cellular localization databases
+and prediction methods are available only for a few species
+and methods relying heavily on these annotations are not
+directly applicable for inferring proteins that perform a
+moonlighting function. Thus, a case for predicting novel mDBPs
+from the proposed features is made out for this work.</p>
+      </sec>
+    </sec>
+    <sec id="sec-5">
+      <title>CONCLUSIONS</title>
+      <p>In this work, we have investigated the moonlighting
+behavior of a special class of proteins, that is, DNA-binding
+proteins as compared to their non-moonlighting
+counterparts. We looked at their predictability by general methods
+of moonlighting prediction in the public domain and
+developed a thorough strategy to predict them from first
+principles using sequence, predicted structure, evolutionary
+proifles, and global gene expression profiles. Our results
+indicate that mDBPs can indeed be predicted from proposed
+feature sets with reasonable confidence. Some of the
+highscoring false predictions of mDBPs were found to already
+have literature evidence of their being mDBPs and others
+are proposed to be candidate novel mDBPs and need
+further experimental assessment.</p>
+    </sec>
+    <sec id="sec-6">
+      <title>DATA AVAILABILITY</title>
+      <p>The source codes and data sets used for this work
+are freely available at https://github.com/Sciwhylab/
+DNA binding moonlighting-protein predictor.git and
+https://doi.org/10.5281/zenodo.7299265.</p>
+    </sec>
+    <sec id="sec-7">
+      <title>SUPPLEMENTARY DATA</title>
+      <p>Supplementary Data are available at NARGAB Online.</p>
+    </sec>
+    <sec id="sec-8">
+      <title>ACKNOWLEDGEMENTS</title>
+      <p>The content of this publication does not necessarily reflect
+the views or policies of the Department of Health and
+Human Services, nor does mention of trade names, commercial</p>
+      <p>NAR Genomics and Bioinformatics, 2022, Vol. 4, No. 4
+products, or organizations imply endorsement by the U.S.
+Government.</p>
+    </sec>
+    <sec id="sec-9">
+      <title>FUNDING</title>
+      <p>National Cancer Institute, National Institutes of Health
+[HHSN261201500003I]; Intramural Research Program of
+the NIH, National Cancer Institute, Center for Cancer
+Research (in part). The work has been supported in part by
+Indian Council of Medical Research Fellowships (to DMV)
+Conflict of interest statement. None declared.</p>
+    </sec>
+  </body>
+  <back>
+    <ref-list>
+      <ref id="ref1">
+        <mixed-citation>
+          1.
+          <string-name>
+            <surname>Flicek</surname>
+            ,
+            <given-names>P.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Ahmed</surname>
+            ,
+            <given-names>I.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Amode</surname>
+            ,
+            <given-names>M.R.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Barrell</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Beal</surname>
+            ,
+            <given-names>K.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Brent</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Carvalho-Silva</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Clapham</surname>
+            ,
+            <given-names>P.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Coates</surname>
+            ,
+            <given-names>G.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Fairley</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          (
+          <year>2012</year>
+          )
+          <article-title>Ensembl 2013</article-title>
+          .
+          <article-title>Nucleic Acids Res</article-title>
+          .,
+          <volume>41</volume>
+          ,
+          <fpage>D48</fpage>
+          -
+          <lpage>D55</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref2">
+        <mixed-citation>
+          2.
+          <string-name>
+            <surname>Zhang</surname>
+            ,
+            <given-names>Z.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Wang</surname>
+            ,
+            <given-names>H.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Li</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Agrawal</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Chen</surname>
+            ,
+            <given-names>X.</given-names>
+          </string-name>
+          and Zhang,
+          <string-name>
+            <surname>R.</surname>
+          </string-name>
+          (
+          <year>2004</year>
+          )
+          <article-title>MDM2 is a negative regulator of p21WAF1/CIP1, independent of p53</article-title>
+          .
+          <source>J. Biol. Chem</source>
+          .,
+          <volume>279</volume>
+          ,
+          <fpage>16000</fpage>
+          -
+          <lpage>16006</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref3">
+        <mixed-citation>
+          3.
+          <string-name>
+            <surname>Saji</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Okumura</surname>
+            ,
+            <given-names>N.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Eguchi</surname>
+            ,
+            <given-names>H.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Nakashima</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Suzuki</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Toi</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Nozawa</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Saji</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Hayashi</surname>
+            ,
+            <given-names>S.-i.</given-names>
+          </string-name>
+          (
+          <year>2001</year>
+          )
+          <article-title>MDM2 enhances the function of estrogen receptor in human breast cancer cells</article-title>
+          .
+          <source>Biochem. Biophys. Res. Commun.</source>
+          ,
+          <volume>281</volume>
+          ,
+          <fpage>259</fpage>
+          -
+          <lpage>265</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref4">
+        <mixed-citation>
+          4.
+          <string-name>
+            <surname>Tompa</surname>
+            ,
+            <given-names>P.</given-names>
+          </string-name>
+          , Sza´sz,
+          <string-name>
+            <given-names>C.</given-names>
+            and
+            <surname>Buday</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>L.</surname>
+          </string-name>
+          (
+          <year>2005</year>
+          )
+          <article-title>Structural disorder throws new light on moonlighting</article-title>
+          .
+          <source>Trends Biochem. Sci.</source>
+          ,
+          <volume>30</volume>
+          ,
+          <fpage>484</fpage>
+          -
+          <lpage>489</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref5">
+        <mixed-citation>
+          5.
+          <string-name>
+            <surname>Koliadenko</surname>
+            ,
+            <given-names>V.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Wilanowski</surname>
+            ,
+            <given-names>T.</given-names>
+          </string-name>
+          (
+          <year>2020</year>
+          )
+          <article-title>Additional functions of selected proteins involved in DNA repair</article-title>
+          .
+          <source>Free Radic. Biol. Med</source>
+          .,
+          <volume>146</volume>
+          ,
+          <fpage>1</fpage>
+          -
+          <lpage>15</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref6">
+        <mixed-citation>
+          6.
+          <string-name>
+            <surname>Jeffery</surname>
+            ,
+            <given-names>C.J.</given-names>
+          </string-name>
+          (
+          <year>1999</year>
+          )
+          <article-title>Moonlighting proteins</article-title>
+          .
+          <source>Trends Biochem. Sci.</source>
+          ,
+          <volume>24</volume>
+          ,
+          <fpage>8</fpage>
+          -
+          <lpage>11</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref7">
+        <mixed-citation>
+          7.
+          <string-name>
+            <surname>Huberts</surname>
+            ,
+            <given-names>D.H.</given-names>
+          </string-name>
+          <article-title>and</article-title>
+          <string-name>
+            <surname>van der Klei</surname>
+            ,
+            <given-names>I.J.</given-names>
+          </string-name>
+          (
+          <year>2010</year>
+          )
+          <article-title>Moonlighting proteins: an intriguing mode of multitasking</article-title>
+          .
+          <source>Biochim. Biophys. Acta (BBA) Mol. Cell Res</source>
+          .,
+          <year>1803</year>
+          ,
+          <fpage>520</fpage>
+          -
+          <lpage>525</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref8">
+        <mixed-citation>
+          8.
+          <string-name>
+            <surname>Copley</surname>
+            ,
+            <given-names>S.D.</given-names>
+          </string-name>
+          (
+          <year>2012</year>
+          )
+          <article-title>Moonlighting is mainstream: paradigm adjustment required</article-title>
+          .
+          <source>Bioessays</source>
+          ,
+          <volume>34</volume>
+          ,
+          <fpage>578</fpage>
+          -
+          <lpage>588</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref9">
+        <mixed-citation>
+          9.
+          <string-name>
+            <surname>Jeffery</surname>
+            ,
+            <given-names>C.J.</given-names>
+          </string-name>
+          (
+          <year>2014</year>
+          )
+          <article-title>An introduction to protein moonlighting</article-title>
+          .
+          <source>Biochem. Soc. Trans.</source>
+          ,
+          <volume>42</volume>
+          ,
+          <fpage>1679</fpage>
+          -
+          <lpage>1683</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref10">
+        <mixed-citation>
+          10.
+          <string-name>
+            <surname>Amblee</surname>
+            ,
+            <given-names>V.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Jeffery</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          (
+          <year>2015</year>
+          )
+          <article-title>Physical features of intracellular proteins that moonlight on the cell surface</article-title>
+          .
+          <source>PLoS One</source>
+          ,
+          <volume>10</volume>
+          ,
+          <year>e0130575</year>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref11">
+        <mixed-citation>
+          11.
+          <string-name>
+            <surname>Piatigorsky</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          (
+          <year>2003</year>
+          )
+          <article-title>Gene sharing, lens crystallins and speculations on an eye/ear evolutionary relationship</article-title>
+          .
+          <source>Integr. Comp. Biol.</source>
+          ,
+          <volume>43</volume>
+          ,
+          <fpage>492</fpage>
+          -
+          <lpage>499</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref12">
+        <mixed-citation>
+          12.
+          <string-name>
+            <surname>Sax</surname>
+            ,
+            <given-names>C.M.</given-names>
+          </string-name>
+          (
+          <year>1994</year>
+          )
+          <article-title>Expression of the -crystallin/small heat-shock protein/molecular chaperone genes in the lens and other tissues</article-title>
+          .
+          <source>Adv. Enzyme Relat</source>
+          .
+          <source>Areas Mol. Biol</source>
+          .,
+          <volume>69</volume>
+          ,
+          <fpage>155</fpage>
+          -
+          <lpage>201</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref13">
+        <mixed-citation>
+          13.
+          <string-name>
+            <surname>Wistow</surname>
+            ,
+            <given-names>G.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Kim</surname>
+            ,
+            <given-names>H.</given-names>
+          </string-name>
+          (
+          <year>1991</year>
+          )
+          <article-title>Lens protein expression in mammals: taxon-specificity and the recruitment of crystallins</article-title>
+          .
+          <source>J. Mol. Evol</source>
+          .,
+          <volume>32</volume>
+          ,
+          <fpage>262</fpage>
+          -
+          <lpage>269</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref14">
+        <mixed-citation>
+          14.
+          <string-name>
+            <surname>Baek</surname>
+            ,
+            <given-names>S.J.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Kim</surname>
+          </string-name>
+          ,K.-S.,
+          <string-name>
+            <surname>Nixon</surname>
+            ,
+            <given-names>J.B.</given-names>
+          </string-name>
+          , Wilson,
+          <string-name>
+            <given-names>L.C.</given-names>
+            and
+            <surname>Eling</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>T.E.</surname>
+          </string-name>
+          (
+          <year>2001</year>
+          )
+          <article-title>Cyclooxygenase inhibitors regulate the expression of a TGFsuperfamily member that has proapoptotic and antitumorigenic activities</article-title>
+          .
+          <source>Mol. Pharmacol</source>
+          .,
+          <volume>59</volume>
+          ,
+          <fpage>901</fpage>
+          -
+          <lpage>908</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref15">
+        <mixed-citation>
+          15.
+          <string-name>
+            <surname>Cekanova</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Lee</surname>
+            ,
+            <given-names>S.-H.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Donnell</surname>
+            ,
+            <given-names>R.L.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Sukhthankar</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Eling</surname>
+            ,
+            <given-names>T.E.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Fischer</surname>
+            ,
+            <given-names>S.M.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Baek</surname>
+            ,
+            <given-names>S.J.</given-names>
+          </string-name>
+          (
+          <year>2009</year>
+          )
+          <article-title>Nonsteroidal anti-inflammatory drug-activated gene-1 expression inhibits urethane-induced pulmonary tumorigenesis in transgenic mice</article-title>
+          .
+          <source>Cancer Prev. Res.</source>
+          ,
+          <volume>2</volume>
+          ,
+          <fpage>450</fpage>
+          -
+          <lpage>458</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref16">
+        <mixed-citation>
+          16.
+          <string-name>
+            <surname>Baek</surname>
+            ,
+            <given-names>S.J.</given-names>
+          </string-name>
+          , Wilson,
+          <string-name>
+            <given-names>L.C.</given-names>
+            and
+            <surname>Eling</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>T.E.</surname>
+          </string-name>
+          (
+          <year>2002</year>
+          )
+          <article-title>Resveratrol enhances the expression of non-steroidal anti-inflammatory drug-activated gene (NAG-1) by increasing the expression of p53</article-title>
+          .
+          <source>Carcinogenesis</source>
+          ,
+          <volume>23</volume>
+          ,
+          <fpage>425</fpage>
+          -
+          <lpage>432</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref17">
+        <mixed-citation>
+          17.
+          <string-name>
+            <surname>Bianchi</surname>
+            ,
+            <given-names>M.E.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Agresti</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          (
+          <year>2005</year>
+          )
+          <article-title>HMG proteins: dynamic players in gene regulation and differentiation</article-title>
+          .
+          <source>Curr. Opin. Genet</source>
+          . Dev.,
+          <volume>15</volume>
+          ,
+          <fpage>496</fpage>
+          -
+          <lpage>506</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref18">
+        <mixed-citation>
+          18.
+          <string-name>
+            <surname>Chen</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Liu</surname>
+            ,
+            <given-names>H.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Zabad</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Rivera</surname>
+            ,
+            <given-names>N.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Rowin</surname>
+            ,
+            <given-names>E.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Hassan</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          , Gomez De Jesus,
+          <string-name>
+            <surname>S.M.</surname>
+          </string-name>
+          , Llina´s Santos,
+          <string-name>
+            <given-names>P.S.</given-names>
+            ,
+            <surname>Kravchenko</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>K.</given-names>
+            and
+            <surname>Mikhova</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>M.</surname>
+          </string-name>
+          (
+          <year>2021</year>
+          )
+          <article-title>MoonProt 3.0: an update of the moonlighting proteins database</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .,
+          <volume>49</volume>
+          ,
+          <fpage>D368</fpage>
+          -
+          <lpage>D372</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref19">
+        <mixed-citation>
+          19.
+          <string-name>
+            <surname>Ribeiro</surname>
+            ,
+            <given-names>D.M.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Briere</surname>
+            ,
+            <given-names>G.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Bely</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Spinelli</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Brun</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          (
+          <year>2019</year>
+          )
+          <article-title>MoonDB 2.0: an updated database of extreme multifunctional and moonlighting proteins</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .,
+          <volume>47</volume>
+          ,
+          <fpage>D398</fpage>
+          -
+          <lpage>D402</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref20">
+        <mixed-citation>
+          20.
+          <string-name>
+            <surname>Franco-Serrano</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          , Herna´ndez,
+          <string-name>
+            <given-names>S.</given-names>
+            ,
+            <surname>Calvo</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>A.</given-names>
+            ,
+            <surname>Severi</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>M.A.</given-names>
+            ,
+            <surname>Ferragut</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>G.</surname>
+          </string-name>
+          ,
+          <article-title>Pe´rez-</article-title>
+          <string-name>
+            <surname>Pons</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          , Pi n˜ol,J.,
+          <string-name>
+            <surname>Pich</surname>
+            ,
+            <given-names>O`.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Mozo-Villarias</surname>
+            ,
+            <given-names>A</given-names>
+          </string-name>
+          ´. and
+          <string-name>
+            <surname>Amela</surname>
+            ,
+            <given-names>I.</given-names>
+          </string-name>
+          (
+          <year>2018</year>
+          )
+          <article-title>MultitaskProtDB-II: an update of a database of multitasking/moonlighting proteins</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .,
+          <volume>46</volume>
+          ,
+          <fpage>D645</fpage>
+          -
+          <lpage>D648</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref21">
+        <mixed-citation>
+          21.
+          <string-name>
+            <surname>Su</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Qian</surname>
+            ,
+            <given-names>Z.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Li</surname>
+            ,
+            <given-names>T.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Zhou</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Wong</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          (
+          <year>2019</year>
+          )
+          <article-title>PlantMP: a database for moonlighting plant proteins</article-title>
+          .
+          <source>Database</source>
+          ,
+          <year>2019</year>
+          ,
+          <year>baz050</year>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref22">
+        <mixed-citation>
+          22.
+          <string-name>
+            <surname>Becker</surname>
+            ,
+            <given-names>E.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Robisson</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Chapple</surname>
+            ,
+            <given-names>C.E.</given-names>
+          </string-name>
+          , Gue´noche,A. and
+          <string-name>
+            <surname>Brun</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          (
+          <year>2012</year>
+          )
+          <article-title>Multifunctional proteins revealed by overlapping clustering in protein interaction network</article-title>
+          .
+          <source>Bioinformatics</source>
+          ,
+          <volume>28</volume>
+          ,
+          <fpage>84</fpage>
+          -
+          <lpage>90</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref23">
+        <mixed-citation>
+          23.
+          <string-name>
+            <surname>Chapple</surname>
+            ,
+            <given-names>C.E.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Robisson</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Spinelli</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Guien</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Becker</surname>
+            ,
+            <given-names>E.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Brun</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          (
+          <year>2015</year>
+          )
+          <article-title>Extreme multifunctional proteins identified from a human protein interaction network</article-title>
+          .
+          <source>Nat. Commun</source>
+          .,
+          <volume>6</volume>
+          ,
+          <fpage>7412</fpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref24">
+        <mixed-citation>
+          24.
+          <string-name>
+            <surname>Khan</surname>
+            ,
+            <given-names>I.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Bhuiyan</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Kihara</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          (
+          <year>2017</year>
+          )
+          <article-title>DextMP: deep dive into text for predicting moonlighting proteins</article-title>
+          .
+          <source>Bioinformatics</source>
+          ,
+          <volume>33</volume>
+          ,
+          <fpage>i83</fpage>
+          -
+          <lpage>i91</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref25">
+        <mixed-citation>
+          25. Herna´ndez,
+          <string-name>
+            <given-names>S.</given-names>
+            ,
+            <surname>Franco</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>L.</given-names>
+            ,
+            <surname>Calvo</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>A.</given-names>
+            ,
+            <surname>Ferragut</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>G.</given-names>
+            ,
+            <surname>Hermoso</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>A.</given-names>
+            ,
+            <surname>Amela</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>I.</surname>
+          </string-name>
+          , G o´
+          <article-title>mez,</article-title>
+          <string-name>
+            <given-names>A.</given-names>
+            ,
+            <surname>Querol</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>E.</given-names>
+            and
+            <surname>Cedano</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>J.</surname>
+          </string-name>
+          (
+          <year>2015</year>
+          )
+          <article-title>Bioinformatics and moonlighting proteins</article-title>
+          .
+          <source>Front. Bioeng. Biotechnol</source>
+          .,
+          <volume>3</volume>
+          ,
+          <fpage>90</fpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref26">
+        <mixed-citation>
+          26.
+          <string-name>
+            <surname>Khan</surname>
+            ,
+            <given-names>I.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Chitale</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Rayon</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Kihara</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          (
+          <year>2012</year>
+          )
+          <article-title>In: BMC proceedings</article-title>
+          .
+          <source>BioMed Central</source>
+          , Vol.
+          <volume>6</volume>
+          , pp.
+          <fpage>1</fpage>
+          -
+          <lpage>5</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref27">
+        <mixed-citation>
+          27.
+          <string-name>
+            <surname>Hernandez</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Ferragut</surname>
+            ,
+            <given-names>G.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Amela</surname>
+            ,
+            <given-names>I.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Perez-Pons</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Pinol</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Mozo-Villarias</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Cedano</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Querol</surname>
+            ,
+            <given-names>E.</given-names>
+          </string-name>
+          (
+          <year>2014</year>
+          )
+          <article-title>MultitaskProtDB: a database of multitasking proteins</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .,
+          <volume>42</volume>
+          ,
+          <fpage>D517</fpage>
+          -
+          <lpage>D520</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref28">
+        <mixed-citation>
+          28.
+          <string-name>
+            <surname>Altschul</surname>
+            ,
+            <given-names>S.F.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Madden</surname>
+            ,
+            <given-names>T.L.</given-names>
+          </string-name>
+          , Scha¨ffer,
+          <string-name>
+            <given-names>A.A.</given-names>
+            ,
+            <surname>Zhang</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>J.</given-names>
+            ,
+            <surname>Zhang</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>Z.</given-names>
+            ,
+            <surname>Miller</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>W.</given-names>
+            and
+            <surname>Lipman</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>D.J.</surname>
+          </string-name>
+          (
+          <year>1997</year>
+          )
+          <article-title>Gapped BLAST and PSI-BLAST: a new generation of protein database search programs</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .,
+          <volume>25</volume>
+          ,
+          <fpage>3389</fpage>
+          -
+          <lpage>3402</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref29">
+        <mixed-citation>
+          29.
+          <string-name>
+            <surname>Gomez</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Domedel</surname>
+            ,
+            <given-names>N.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Cedano</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          , Pi n˜ol,J. and
+          <string-name>
+            <surname>Querol</surname>
+            ,
+            <given-names>E.</given-names>
+          </string-name>
+          (
+          <year>2003</year>
+          )
+          <article-title>Do current sequence analysis algorithms disclose multifunctional (moonlighting) proteins</article-title>
+          ?Bioinformatics,
+          <volume>19</volume>
+          ,
+          <fpage>895</fpage>
+          -
+          <lpage>896</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref30">
+        <mixed-citation>
+          30.
+          <string-name>
+            <surname>Gomez</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Hernandez</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Amela</surname>
+            ,
+            <given-names>I.</given-names>
+          </string-name>
+          , Pi n˜ol,J.,
+          <string-name>
+            <surname>Cedano</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Querol</surname>
+            ,
+            <given-names>E.</given-names>
+          </string-name>
+          (
+          <year>2011</year>
+          )
+          <article-title>Do protein-protein interaction databases identify moonlighting proteins?Mol</article-title>
+          . Biosyst.,
+          <volume>7</volume>
+          ,
+          <fpage>2379</fpage>
+          -
+          <lpage>2382</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref31">
+        <mixed-citation>
+          31.
+          <string-name>
+            <surname>Hernandez</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Amela</surname>
+            ,
+            <given-names>I.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Cedano</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          , Pi n˜ol,J.,
+          <string-name>
+            <surname>Perez-Pons</surname>
+            ,
+            <given-names>J.A.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Mozo-Villarias</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Querol</surname>
+            ,
+            <given-names>E.</given-names>
+          </string-name>
+          (
+          <year>2012</year>
+          )
+          <article-title>Do moonlighting proteins belong to the intrinsically disordered protein class? J</article-title>
+          .
+          <string-name>
+            <surname>Proteom</surname>
+          </string-name>
+          . Bioinform.,
+          <volume>5</volume>
+          ,
+          <fpage>262</fpage>
+          -
+          <lpage>264</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref32">
+        <mixed-citation>
+          32.
+          <string-name>
+            <surname>Khan</surname>
+            ,
+            <given-names>I.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Kihara</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          (
+          <year>2016</year>
+          )
+          <article-title>Genome-scale prediction of moonlighting proteins using diverse protein association information</article-title>
+          .
+          <source>Bioinformatics</source>
+          ,
+          <volume>32</volume>
+          ,
+          <fpage>2281</fpage>
+          -
+          <lpage>2288</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref33">
+        <mixed-citation>
+          33.
+          <string-name>
+            <surname>Liu</surname>
+            ,
+            <given-names>X.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Shen</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Zhang</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Liu</surname>
+            ,
+            <given-names>F.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Ma</surname>
+            ,
+            <given-names>Z.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Yue</surname>
+            ,
+            <given-names>Z.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Yue</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          (
+          <year>2021</year>
+          )
+          <article-title>IdentPMP: identification of moonlighting proteins in plants using sequence-based learning models</article-title>
+          .
+          <source>PeerJ</source>
+          ,
+          <volume>9</volume>
+          ,
+          <fpage>e11900</fpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref34">
+        <mixed-citation>
+          34.
+          <string-name>
+            <surname>Li</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Zhao</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Liu</surname>
+            ,
+            <given-names>Z.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Wang</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Wei</surname>
+          </string-name>
+          ,L.,
+          <string-name>
+            <surname>Han</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Du</surname>
+            ,
+            <given-names>W.</given-names>
+          </string-name>
+          (
+          <year>2021</year>
+          )
+          <article-title>De novo prediction of moonlighting proteins using multimodal deep ensemble learning</article-title>
+          .
+          <source>Frontiers in Genetics</source>
+          ,
+          <volume>12</volume>
+          ,
+          <fpage>254</fpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref35">
+        <mixed-citation>
+          35.
+          <string-name>
+            <surname>Shirafkan</surname>
+            ,
+            <given-names>F.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Gharaghani</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Rahimian</surname>
+            ,
+            <given-names>K.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Sajedi</surname>
+            ,
+            <given-names>R.H.</given-names>
+          </string-name>
+          <article-title>and</article-title>
+          <string-name>
+            <surname>Zahiri</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          (
+          <year>2021</year>
+          )
+          <article-title>Moonlighting protein prediction using physico-chemical and evolutional properties via machine learning methods</article-title>
+          .
+          <source>BMC Bioinformatics</source>
+          ,
+          <volume>22</volume>
+          ,
+          <fpage>261</fpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref36">
+        <mixed-citation>
+          36.
+          <string-name>
+            <surname>Ahmad</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Prathipati</surname>
+            ,
+            <given-names>P.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Tripathi</surname>
+            ,
+            <given-names>L.P.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Chen</surname>
+            ,
+            <given-names>Y.-A.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Arya</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Murakami</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Mizuguchi</surname>
+            ,
+            <given-names>K.</given-names>
+          </string-name>
+          (
+          <year>2018</year>
+          )
+          <article-title>Integrating sequence and gene expression information predicts genome-wide DNA-binding proteins and suggests a cooperative mechanism</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .,
+          <volume>46</volume>
+          ,
+          <fpage>54</fpage>
+          -
+          <lpage>70</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref37">
+        <mixed-citation>
+          37.
+          <string-name>
+            <surname>Andrabi</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Mizuguchi</surname>
+            ,
+            <given-names>K.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Sarai</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Ahmad</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          (
+          <year>2009</year>
+          )
+          <article-title>Prediction of mono-and di-nucleotide-specific DNA-binding sites in proteins using neural networks</article-title>
+          .
+          <source>BMC Struct. Biol</source>
+          .,
+          <volume>9</volume>
+          ,
+          <fpage>30</fpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref38">
+        <mixed-citation>
+          38. Ka¨llberg,
+          <string-name>
+            <given-names>M.</given-names>
+            ,
+            <surname>Wang</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>H.</given-names>
+            ,
+            <surname>Wang</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>S.</given-names>
+            ,
+            <surname>Peng</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>J.</given-names>
+            ,
+            <surname>Wang</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>Z.</given-names>
+            ,
+            <surname>Lu</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>H.</surname>
+          </string-name>
+          <article-title>and</article-title>
+          <string-name>
+            <surname>Xu</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          (
+          <year>2012</year>
+          )
+          <article-title>Template-based protein structure modeling using the RaptorX web server</article-title>
+          .
+          <source>Nat. Protoc</source>
+          .,
+          <volume>7</volume>
+          ,
+          <fpage>1511</fpage>
+          -
+          <lpage>1522</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref39">
+        <mixed-citation>
+          39.
+          <string-name>
+            <surname>Chen</surname>
+            ,
+            <given-names>Y.-A.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Tripathi</surname>
+            ,
+            <given-names>L.P.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Fujiwara</surname>
+            ,
+            <given-names>T.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Kameyama</surname>
+            ,
+            <given-names>T.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Itoh</surname>
+            ,
+            <given-names>M.N.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Mizuguchi</surname>
+            ,
+            <given-names>K.</given-names>
+          </string-name>
+          (
+          <year>2019</year>
+          )
+          <article-title>The targetmine data warehouse: enhancement and updates</article-title>
+          .
+          <source>Front. Genetics</source>
+          ,
+          <volume>10</volume>
+          ,
+          <fpage>934</fpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref40">
+        <mixed-citation>
+          40.
+          <string-name>
+            <surname>Breiman</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          (
+          <year>2001</year>
+          )
+          <article-title>Random forests</article-title>
+          .
+          <source>Machine Learning</source>
+          ,
+          <volume>45</volume>
+          ,
+          <fpage>5</fpage>
+          -
+          <lpage>32</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref41">
+        <mixed-citation>
+          41.
+          <string-name>
+            <surname>Chen</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Liaw</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Breiman</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          (
+          <year>2004</year>
+          )
+          <article-title>Using random forest to learn imbalanced data</article-title>
+          . University of California, Berkeley,
+          <volume>110</volume>
+          ,
+          <fpage>24</fpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref42">
+        <mixed-citation>
+          42.
+          <string-name>
+            <surname>Hancock</surname>
+            ,
+            <given-names>J.T.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Khoshgoftaar</surname>
+            ,
+            <given-names>T.M.</given-names>
+          </string-name>
+          (
+          <year>2020</year>
+          )
+          <article-title>CatBoost for big data: an interdisciplinary review</article-title>
+          .
+          <source>J. Big Data</source>
+          ,
+          <volume>7</volume>
+          ,
+          <fpage>94</fpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref43">
+        <mixed-citation>
+          43.
+          <string-name>
+            <surname>Chen</surname>
+            ,
+            <given-names>T.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Guestrin</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          (
+          <year>2016</year>
+          )
+          <article-title>In: Proceedings of the 22nd acmsigkdd international conference on knowledge discovery and data mining</article-title>
+          . pp.
+          <fpage>785</fpage>
+          -
+          <lpage>794</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref44">
+        <mixed-citation>
+          44.
+          <string-name>
+            <surname>Le</surname>
+            ,
+            <given-names>N.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Do</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Nguyen</surname>
+            ,
+            <given-names>T.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Le</surname>
+            ,
+            <given-names>Q.</given-names>
+          </string-name>
+          (
+          <year>2021</year>
+          )
+          <article-title>A sequence-based prediction of Kruppel-like factors proteins using XGBoost and optimized features</article-title>
+          .
+          <source>Gene</source>
+          ,
+          <volume>787</volume>
+          ,
+          <fpage>145643</fpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref45">
+        <mixed-citation>
+          45.
+          <string-name>
+            <surname>Ke</surname>
+            ,
+            <given-names>G.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Meng</surname>
+            ,
+            <given-names>Q.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Finley</surname>
+            ,
+            <given-names>T.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Wang</surname>
+            ,
+            <given-names>T.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Chen</surname>
+            ,
+            <given-names>W.</given-names>
+          </string-name>
+          , Ma,
+          <string-name>
+            <given-names>W.</given-names>
+            ,
+            <surname>Ye</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Q.</surname>
+          </string-name>
+          and Liu,T.-Y. (
+          <year>2017</year>
+          )
+          <article-title>Lightgbm: a highly efficient gradient boosting decision tree</article-title>
+          .
+          <source>Adv. Neural. Inf. Process Syst</source>
+          .,
+          <volume>30</volume>
+          ,
+          <fpage>3146</fpage>
+          -
+          <lpage>3154</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref46">
+        <mixed-citation>
+          46.
+          <string-name>
+            <surname>Chauhan</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Ahmad</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          (
+          <year>2019</year>
+          )
+          <article-title>Enabling full-length evolutionary profiles based deep convolutional neural network for predicting DNA-binding proteins from sequence</article-title>
+          .
+          <source>Proteins: Struct. Funct. Bioinformatics</source>
+          ,
+          <volume>88</volume>
+          ,
+          <fpage>15</fpage>
+          -
+          <lpage>30</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref47">
+        <mixed-citation>
+          47.
+          <string-name>
+            <surname>Ahmad</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Sarai</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          (
+          <year>2005</year>
+          )
+          <article-title>PSSM-based prediction of DNA binding sites in proteins</article-title>
+          ..
+          <source>BMC Bioinformatics</source>
+          ,
+          <volume>6</volume>
+          ,
+          <fpage>33</fpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref48">
+        <mixed-citation>
+          48.
+          <string-name>
+            <surname>Le</surname>
+            ,
+            <given-names>N.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Ou</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          (
+          <year>2016</year>
+          )
+          <article-title>Incorporating efficient radial basis function networks and significant amino acid pairs for predicting GTP binding sites in transport proteins</article-title>
+          .
+          <source>BMC Bioinformatics</source>
+          ,
+          <volume>17</volume>
+          ,
+          <fpage>501</fpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref49">
+        <mixed-citation>
+          49.
+          <string-name>
+            <surname>Ofran</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Mysore</surname>
+            ,
+            <given-names>V.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Rost</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          (
+          <year>2007</year>
+          )
+          <article-title>Prediction of DNA-binding residues from sequence</article-title>
+          .
+          <source>Bioinformatics</source>
+          ,
+          <volume>23</volume>
+          ,
+          <fpage>i347</fpage>
+          -
+          <lpage>i353</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref50">
+        <mixed-citation>
+          50.
+          <string-name>
+            <surname>Yang</surname>
+            ,
+            <given-names>X.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Wang</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Sun</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          and Liu,
+          <string-name>
+            <surname>R.</surname>
+          </string-name>
+          (
+          <year>2015</year>
+          )
+          <article-title>SNBRFinder: a sequence-based hybrid algorithm for enhanced prediction of nucleic acid-binding residues</article-title>
+          .
+          <source>PloS one</source>
+          ,
+          <volume>10</volume>
+          ,
+          <year>e0133260</year>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref51">
+        <mixed-citation>
+          51.
+          <string-name>
+            <surname>Peng</surname>
+            ,
+            <given-names>Z.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Kurgan</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          (
+          <year>2015</year>
+          )
+          <article-title>High-throughput prediction of RNA, DNA and protein binding regions mediated by intrinsic disorder</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .,
+          <volume>43</volume>
+          ,
+          <year>e121</year>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref52">
+        <mixed-citation>
+          52.
+          <string-name>
+            <surname>Taherzadeh</surname>
+            ,
+            <given-names>G.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Yang</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          , Zhang,
+          <string-name>
+            <given-names>T.</given-names>
+            ,
+            <surname>Liew</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>A.W.C.</given-names>
+            and
+            <surname>Zhou</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Y.</surname>
+          </string-name>
+          (
+          <year>2016</year>
+          )
+          <article-title>Sequence-based prediction of protein-peptide binding sites using support vector machine</article-title>
+          .
+          <source>J. Comput. Chem</source>
+          .,
+          <volume>37</volume>
+          ,
+          <fpage>1223</fpage>
+          -
+          <lpage>1229</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref53">
+        <mixed-citation>
+          53.
+          <string-name>
+            <surname>Zhang</surname>
+            ,
+            <given-names>T.</given-names>
+          </string-name>
+          , Zhang,H.,
+          <string-name>
+            <surname>Chen</surname>
+            ,
+            <given-names>K.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Ruan</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Shen</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Kurgan</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          (
+          <year>2010</year>
+          )
+          <article-title>Analysis and prediction of RNA-binding residues using sequence, evolutionary conservation, and predicted secondary structure and solvent accessibility</article-title>
+          .
+          <source>Curr. Protein Pept. Sci</source>
+          ,
+          <volume>11</volume>
+          ,
+          <fpage>609</fpage>
+          -
+          <lpage>628</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref54">
+        <mixed-citation>
+          54.
+          <string-name>
+            <surname>Yu</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Cortez</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          (
+          <year>2011</year>
+          )
+          <article-title>A role for CDK9-cyclin k in maintaining genome integrity</article-title>
+          .
+          <source>Cell Cycle</source>
+          ,
+          <volume>10</volume>
+          ,
+          <fpage>28</fpage>
+          -
+          <lpage>32</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref55">
+        <mixed-citation>
+          55.
+          <string-name>
+            <surname>Guo</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Shyr</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Cortez</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          (
+          <year>2010</year>
+          )
+          <article-title>Cyclin-dependent kinase 9-cyclin k functions in the replication stress response</article-title>
+          .
+          <source>EMBO Rep</source>
+          .,
+          <volume>11</volume>
+          ,
+          <fpage>876</fpage>
+          -
+          <lpage>882</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref56">
+        <mixed-citation>
+          56.
+          <string-name>
+            <surname>Lim</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Kaldis</surname>
+            ,
+            <given-names>P.</given-names>
+          </string-name>
+          (
+          <year>2013</year>
+          )
+          <article-title>Cdks, cyclins and CKIs: roles beyond cell cycle regulation</article-title>
+          .
+          <source>Development</source>
+          ,
+          <volume>140</volume>
+          ,
+          <fpage>3079</fpage>
+          -
+          <lpage>3093</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref57">
+        <mixed-citation>
+          57.
+          <string-name>
+            <surname>Rodr</surname>
+          </string-name>
+          <article-title>´ıguez-</article-title>
+          <string-name>
+            <surname>Berdini</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Ferrero</surname>
+            ,
+            <given-names>G.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Bustos</surname>
+            ,
+            <given-names>P.F.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>AM</surname>
+            ,
+            <given-names>C.G.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Prucca</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Quiroga</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Caputto</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          (
+          <year>2020</year>
+          )
+          <article-title>The moonlighting protein c-Fos activates lipid synthesis in neurons, an activity that is critical for cellular differentiation and cortical development</article-title>
+          .
+          <source>J. Biol. Chem</source>
+          .,
+          <volume>295</volume>
+          ,
+          <fpage>8808</fpage>
+          -
+          <lpage>8818</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref58">
+        <mixed-citation>
+          58.
+          <string-name>
+            <surname>Chang</surname>
+            ,
+            <given-names>W.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Chen</surname>
+            ,
+            <given-names>H.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Chiou</surname>
+            ,
+            <given-names>R.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Chen</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Huang</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          (
+          <year>2005</year>
+          )
+          <article-title>A novel function of transcription factor alpha-Pal/NRF-1: increasing neurite outgrowth</article-title>
+          .
+          <source>Biochem. Biophys. Res. Commun.</source>
+          ,
+          <volume>334</volume>
+          ,
+          <fpage>199</fpage>
+          -
+          <lpage>206</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref59">
+        <mixed-citation>
+          59.
+          <string-name>
+            <surname>Ruvkun</surname>
+            ,
+            <given-names>G.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Lehrbach</surname>
+            ,
+            <given-names>N.</given-names>
+          </string-name>
+          (
+          <year>2022</year>
+          )
+          <article-title>Regulation and functions of the ER-Associated nrf1 transcription factor</article-title>
+          .
+          <source>Cold Spring Harb. Perspect. Biol</source>
+          ., https://doi.org/10.1101/cshperspect.a041266.
+        </mixed-citation>
+      </ref>
+      <ref id="ref60">
+        <mixed-citation>
+          60.
+          <string-name>
+            <surname>Ganini</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Santos</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Bonini</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Mason</surname>
+            ,
+            <given-names>R.</given-names>
+          </string-name>
+          (
+          <year>2018</year>
+          )
+          <article-title>Switch of mitochondrial superoxide dismutase into a prooxidant peroxidase in manganese-deficient cells and mice</article-title>
+          .
+          <source>Cell Chem. Biol</source>
+          .
+          <volume>25</volume>
+          ,
+          <fpage>413</fpage>
+          -
+          <lpage>425</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref61">
+        <mixed-citation>
+          61.
+          <string-name>
+            <surname>Henderson</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Martin</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          (
+          <year>2014</year>
+          )
+          <article-title>Protein moonlighting: a new factor in biology and medicine</article-title>
+          .
+          <source>Biochem. Soc. Trans</source>
+          ,
+          <volume>42</volume>
+          ,
+          <fpage>1671</fpage>
+          -
+          <lpage>1678</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref62">
+        <mixed-citation>
+          62.
+          <string-name>
+            <surname>Zanzoni</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Ribeiro</surname>
+            ,
+            <given-names>D.M.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Brun</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          (
+          <year>2019</year>
+          )
+          <article-title>Understanding protein multifunctionality: from short linear motifs to cellular functions.</article-title>
+          .
+          <source>Cell. Mol. Life Sci</source>
+          ,
+          <volume>76</volume>
+          ,
+          <fpage>4407</fpage>
+          -
+          <lpage>4412</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref63">
+        <mixed-citation>
+          63.
+          <string-name>
+            <surname>Horton</surname>
+            ,
+            <given-names>P.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Park</surname>
+          </string-name>
+          ,K.-J.,
+          <string-name>
+            <surname>Obayashi</surname>
+            ,
+            <given-names>T.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Fujita</surname>
+            ,
+            <given-names>N.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Harada</surname>
+            ,
+            <given-names>H.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Adams-Collier</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Nakai</surname>
+            ,
+            <given-names>K.</given-names>
+          </string-name>
+          (
+          <year>2007</year>
+          )
+          <article-title>WoLF PSORT: protein localization predictor</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .,
+          <volume>35</volume>
+          ,
+          <fpage>W585</fpage>
+          -
+          <lpage>W587</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref64">
+        <mixed-citation>
+          64.
+          <string-name>
+            <surname>Briesemeister</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          , Rahnenf u¨hrer,J. and
+          <string-name>
+            <surname>Kohlbacher</surname>
+            ,
+            <given-names>O.</given-names>
+          </string-name>
+          (
+          <year>2010</year>
+          )
+          <article-title>YLoc--an interpretable web server for predicting subcellular localization</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .,
+          <volume>38</volume>
+          ,
+          <fpage>W497</fpage>
+          -
+          <lpage>W502</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref65">
+        <mixed-citation>
+          65.
+          <string-name>
+            <surname>Emanuelsson</surname>
+            ,
+            <given-names>O.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Nielsen</surname>
+            ,
+            <given-names>H.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Brunak</surname>
+          </string-name>
+          ,S. and
+          <string-name>
+            <surname>von Heijne</surname>
+            ,
+            <given-names>G.</given-names>
+          </string-name>
+          (
+          <year>2000</year>
+          )
+          <article-title>Predicting subcellular localization of proteins based on their N-terminal amino acid sequence</article-title>
+          .
+          <source>J. Mol. Biol</source>
+          .,
+          <volume>300</volume>
+          ,
+          <fpage>1005</fpage>
+          -
+          <lpage>1016</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref66">
+        <mixed-citation>
+          66.
+          <string-name>
+            <surname>Krogh</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Larsson</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Von Heijne</surname>
+            ,
+            <given-names>G.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Sonnhammer</surname>
+            ,
+            <given-names>E.L.</given-names>
+          </string-name>
+          (
+          <year>2001</year>
+          )
+          <article-title>Predicting transmembrane protein topology with a hidden markov model: application to complete genomes</article-title>
+          .
+          <source>J. Mol. Biol</source>
+          .,
+          <volume>305</volume>
+          ,
+          <fpage>567</fpage>
+          -
+          <lpage>580</lpage>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref67">
+        <mixed-citation>
+          67.
+          <string-name>
+            <surname>Binder</surname>
+            ,
+            <given-names>J.X.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Pletscher-Frankild</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Tsafou</surname>
+            ,
+            <given-names>K.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Stolte</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>O'Donoghue</surname>
+            ,
+            <given-names>S.I.</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <surname>Schneider</surname>
+            ,
+            <given-names>R.</given-names>
+          </string-name>
+          and
+          <string-name>
+            <surname>Jensen</surname>
+            ,
+            <given-names>L.J.</given-names>
+          </string-name>
+          (
+          <year>2014</year>
+          )
+          <article-title>COMPARTMENTS: unification and visualization of protein subcellular localization evidence</article-title>
+          .
+          <source>Database</source>
+          ,
+          <year>2014</year>
+          ,
+          <year>bau012</year>
+          .
+        </mixed-citation>
+      </ref>
+    </ref-list>
+  </back>
+</article>

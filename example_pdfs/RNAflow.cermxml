@@ -1,0 +1,3009 @@
+<!DOCTYPE article PUBLIC "-//NLM//DTD JATS (Z39.96) Journal Archiving and Interchange DTD v1.0 20120330//EN" "JATS-archivearticle1.dtd">
+<article xmlns:xlink="http://www.w3.org/1999/xlink">
+  <front>
+    <journal-meta>
+      <journal-title-group>
+        <journal-title>Genes</journal-title>
+      </journal-title-group>
+    </journal-meta>
+    <article-meta>
+      <article-id pub-id-type="doi">10.3390/genes11121487</article-id>
+      <title-group>
+        <article-title>RNAflow: An Effective and Simple RNA-Seq Differential Gene Expression Pipeline Using Nextflow</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author">
+          <string-name>Marie Lataretu</string-name>
+          <email>marie.lataretu@uni-jena.de</email>
+          <xref ref-type="aff" rid="aff0">0</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <string-name>Martin Hölzer</string-name>
+          <xref ref-type="aff" rid="aff0">0</xref>
+        </contrib>
+        <aff id="aff0">
+          <label>0</label>
+          <institution>RNA Bioinformatics and High-Throughput Analysis, Friedrich Schiller University Jena</institution>
+          ,
+          <addr-line>Leutragraben 1, 07743 Jena</addr-line>
+          ,
+          <country country="DE">Germany</country>
+        </aff>
+      </contrib-group>
+      <pub-date>
+        <year>2020</year>
+      </pub-date>
+      <volume>11</volume>
+      <fpage>2</fpage>
+      <lpage>18</lpage>
+      <history>
+        <date date-type="accepted">
+          <day>7</day>
+          <month>12</month>
+          <year>2020</year>
+        </date>
+        <date date-type="received">
+          <day>25</day>
+          <month>10</month>
+          <year>2020</year>
+        </date>
+      </history>
+      <abstract>
+        <p>RNA-Seq enables the identification and quantification of RNA molecules, often with the aim of detecting differentially expressed genes (DEGs). Although RNA-Seq evolved into a standard technique, there is no universal gold standard for these data's computational analysis. On top of that, previous studies proved the irreproducibility of RNA-Seq studies. Here, we present a portable, scalable, and parallelizable Nextflow RNA-Seq pipeline to detect DEGs, which assures a high level of reproducibility. The pipeline automatically takes care of common pitfalls, such as ribosomal RNA removal and low abundance gene filtering. Apart from various visualizations for the DEG results, we incorporated downstream pathway analysis for common species as Homo sapiens and Mus musculus. We evaluated the DEG detection functionality while using qRT-PCR data serving as a reference and observed a very high correlation of the logarithmized gene expression fold changes.</p>
+      </abstract>
+      <kwd-group>
+        <kwd>RNA-Seq</kwd>
+        <kwd>workflow</kwd>
+        <kwd>Nextflow pipeline</kwd>
+        <kwd>differential gene expression analysis</kwd>
+      </kwd-group>
+    </article-meta>
+  </front>
+  <body>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\RNAflow.images\img_1_1.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\RNAflow.images\img_1_2.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\RNAflow.images\img_1_3.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\RNAflow.images\img_1_4.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\RNAflow.images\img_7_1.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\RNAflow.images\img_7_2.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\RNAflow.images\img_8_1.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\RNAflow.images\img_10_1.png" />
+    </fig>
+    <fig>
+      <graphic xlink:href="D:\Internships\internship_2024\JSONmaker\new_pdfs\RNAflow.images\img_17_1.png" />
+    </fig>
+    <sec id="sec-1">
+      <title>1. Introduction</title>
+      <p>
+        More than a decade ago, the possibility to sequence the transcriptome (RNA-Seq) of any given
+species, starting from small bacteria, such as Helicobacter pylori [
+        <xref ref-type="bibr" rid="ref1">1</xref>
+        ], opened up completely new ways
+to analyze gene expression and obtain never before possible insights into regulatory mechanisms on
+an incredibly large scale. Starting from short, single-end reads and few samples per study, we now
+have access to continuously growing and large transcriptomic data sets of high sequencing quality [
+        <xref ref-type="bibr" rid="ref2">2</xref>
+        ].
+A standard and widely distributed computational task comprises the processing of RNA-Seq data to
+identify differentially expressed features, mainly genes (DEGs), between varying conditions, such as
+different tissue types or control vs. treated samples. Although being frequently performed nowadays,
+setting up the necessary computational steps to perform an RNA-Seq-based DEG study is still
+time-consuming and prone to errors, which ultimately leads to results that are difficult to reproduce [
+        <xref ref-type="bibr" rid="ref3">3</xref>
+        ].
+      </p>
+      <p>However, why are, even after a decade of RNA-Seq tool development and pipeline construction,
+such studies still difficult to run and reproduce? The main reason is that, as in other bioinformatic areas,
+RNA-Seq computational studies are complex. Dozens of dependencies for different tools performing
+sub-tasks, such as quality control, trimming, mapping, and counting, need to be considered and
+appropriately handled. In addition, the experimental nature of academic software tends to be difficult
+to install, configure, and deploy. Finally, calculations need to run on heterogeneous execution platforms
+and system architectures, which range from a small laptop to a high-performance cluster or the cloud.
+Thus, with increasing access to high-performance computers and cloud resources, the scalability of
+bioinformatics pipelines becomes increasingly important.</p>
+      <p>
+        An incredible number of differential expression pipelines were developed in the past because of
+the wide range of applications that RNA-Seq has [
+        <xref ref-type="bibr" rid="ref10 ref4 ref5 ref6 ref7 ref8 ref9">4–10</xref>
+        ] and, almost certainly, there is an even larger
+number of RNA-Seq pipelines developed in parallel in many research groups that will never leave
+their domestic computing environment. Thus, we decided to develop yet another RNA-Seq pipeline
+to detect DEGs; however, with the goals to be (1) easy to install, execute, and reproduce, (2) easy to
+maintain and extend, and (3) to provide reasonable results with a minimal set of input parameters also
+for non-experts. We achieve these goals by using a state-of-the-art workflow management system and
+packaging and container systems for each tool included in the pipeline.
+      </p>
+    </sec>
+    <sec id="sec-2">
+      <title>2. Materials and Methods</title>
+      <sec id="sec-2-1">
+        <title>2.1. Implementation</title>
+        <p>
+          Our pipeline is implemented in a reactive workflow manager Nextflow v20.10.0 [
+          <xref ref-type="bibr" rid="ref11">11</xref>
+          ], which makes
+it portable, scalable, parallelizable, and ensures a high level of reproducibility. Furthermore,
+our implementation allows for selectively re-executing parts of the workflow in the case of additional
+inputs or configuration changes and to resume execution at the point where the workflow was
+stopped; this especially important in large-scale and time-consuming RNA-Seq studies. Additionally,
+time-consuming steps, such as indexing of a reference sequence, are only performed once when
+executing the workflow multiple times using the same working directory. Each step is encapsulated in
+a module exploiting dependency management via Conda (https://docs.conda.io) or container usage
+via Docker [
+          <xref ref-type="bibr" rid="ref12">12</xref>
+          ] or Singularity [
+          <xref ref-type="bibr" rid="ref13">13</xref>
+          ] for an easy installation and execution of the pipeline. Only Nextflow
+and Conda or Docker or Singularity need to be installed in order to run the pipeline. Currently,
+the optional transcriptome assembly steps only work with Docker or Singularity due to deprecated
+BioConda environments for certain tools. We provide configurations for local execution and the Slurm
+and LSF workload managers. Because Nextflow offers out-of-the-box execution for many schedulers
+and cloud computing platforms, it can be easily customized to meet individual needs. A recent
+study compared the currently most commonly used workflow management systems (Snakemake,
+Nextflow, CWL) with a focus on rapid prototyping for the analysis of ribosome profiling data and,
+finally, chose Nextflow, which best met the authors’ requirements [
+          <xref ref-type="bibr" rid="ref14">14</xref>
+          ].
+        </p>
+        <p>
+          The pipeline that is presented here covers all necessary steps for a frequently performed
+DEG analysis by incorporating a selection of widely used and well established, but yet up-to-date,
+tools (Figure 1). In the past, we have performed various RNA-Seq expression studies and based our
+choice of tools on this experience. Therefore, for each step (such as trimming, mapping, and counting),
+we have selected tools that are highly cited, maintained, usable, and perform well in recent evaluation
+studies if available. We decided to use an alignment-based mapper, so that the user can actually inspect
+expression patterns and read mappings subsequently with a genome browser. Still, pseudo-alignment
+or alignment-free quantification tools, such as kallisto [
+          <xref ref-type="bibr" rid="ref15">15</xref>
+          ] and Sailfish [
+          <xref ref-type="bibr" rid="ref16">16</xref>
+          ], can serve as
+timeand resource-saving alternatives, and can be considered in a future extension. However, RNA-Seq
+pipelines that use pseudo-alignment methods are ranked low regarding accuracy [
+          <xref ref-type="bibr" rid="ref17">17</xref>
+          ].
+        </p>
+        <p>
+          Most importantly, we automatically deal with common pitfalls in DEG detection with
+RNA-Seq data: ribosomal RNA (rRNA) is removed before mapping, the annotation is filtered for
+features of interest (genes and pseudogenes), low abundance features are filtered out (TPM filter),
+and quantification is based on uniquely mapped reads in order to ensure the most accurate result while
+using default parameters as possible. Although most RNA-Seq protocols include the depletion of
+rRNA before sequencing, moderate up to high amounts of rRNA can still be found in samples [
+          <xref ref-type="bibr" rid="ref18 ref19">18,19</xref>
+          ].
+In particular, this is true for non-model organisms where library preparation kits are not optimized [
+          <xref ref-type="bibr" rid="ref20">20</xref>
+          ].
+Therefore, we have decided to perform an rRNA cleaning step by default, which can be deactivated by
+the user. By providing such a default behavior of the pipeline, we allow non-experts to run a DEG
+analysis with almost no configuration effort to obtain robust results, while experienced users can
+still customize the pipeline, e.g., by also investigating DEGs that are based on multi-mapped reads.
+Only a basic understanding of the command line is required to install and run RNAflow. Nextflow and
+the containerization software can be run on Linux, Mac OS, and Windows supported through WSL2.
+CPU usage can be adjusted freely and it is automatically restricted to the number of available cores.
+The minimum RAM requirement heavily depends on the input data. However, in our experience, 8 GB
+RAM is sufficient for running a human-size RNA-Seq study.
+2.1.1. Input
+        </p>
+        <p>
+          Only two parameters are required in any case: the RNA-Seq reads (single or paired-end) and a
+reference genome with a matching annotation (GTF format). File paths to the RNA-Seq read files and
+meta-data are provided via a comma-separated (CSV) table, where each line annotates one sample with
+a sample name, the path to the FASTQ file, in the case of paired-end data to both files, and the condition
+(such as ‘control’ or ‘treated’). The read files need to be in FASTQ format and they can be gzipped.
+For the genome and annotation, the user can make use of an automated download when working
+with data from Homo sapiens, Mus musculus, Mesocricetus auratus, or E. coli, just by specifying ‘--species’
+with a three-letter shortcut (‘hsa’, ‘mmu’, ‘mau’, and ‘eco’). Otherwise, CSV files pointing to the
+genome(s) in FASTA format and matching annotation(s) in GTF format have to be provided. The two
+input options can also be combined, which is particularly useful, for example, when investigating a
+viral infection in human cells. In such cases, all provided genomes and annotations are concatenated
+for further analysis. The pipeline was primarily built to work on Ensembl [
+          <xref ref-type="bibr" rid="ref21">21</xref>
+          ] annotations, but can
+also handle other annotations, which , however, might lead to reduced features in the final output.
+For example, we extract certain features from Ensembl annotations, such as the gene_biotype, in order
+to display this information in the final output tables. By default, a DEG analysis with all possible
+pairwise comparisons in one direction is performed based on the user-defined conditions in the
+initial CSV file. While using the ‘--deg’ parameter, this behavior can be configured and the user
+can specify which comparisons should be performed by providing an additional CSV file. With the
+‘--assembly’ parameter, one can switch from DEG analysis to transcriptome assembly, where the
+genome(s) and annotation(s) are used for a reference-based transcriptome assembly. For tools that
+need a database (SortMeRNA [
+          <xref ref-type="bibr" rid="ref22">22</xref>
+          ], BUSCO [
+          <xref ref-type="bibr" rid="ref23">23</xref>
+          ], and dammit (http://www.camillescott.org/dammit)),
+the external resources are automatically downloaded and stored in a dedicated project-independent
+folder. Thus, Nextflow is able to check whether the resource is already available and it skips the
+download step the next time the pipeline is executed. The same procedure is used for the provided
+auto-download for genomes and annotations. Accordingly, the pipeline can run offline to a certain
+extent (pathway analyses still require a connection) if all online resources are initially downloaded.
+        </p>
+        <sec id="sec-2-1-1">
+          <title>2.1.2. Preprocessing &amp; Mapping</title>
+          <p>
+            Quality reports of raw reads and preprocessed reads are generated by FastQC v0.11.9 (https:
+//www.bioinformatics.babraham.ac.uk/projects/fastqc/). Quality trimming and adapter clipping are
+performed by fastp v0.20.0 [
+            <xref ref-type="bibr" rid="ref24">24</xref>
+            ] in order to filter the raw reads with a sliding window approach and
+cutting options for front and tail ‘-5 -3’, a default window size of 4 (‘-W 4’), and a default mean quality
+of 20 (‘-M 20’). The minimum length is 15 bp (‘-l 15’) and the maximal number of N base is 5 (‘-n 5’).
+PloyX trimming in 3’ ends is enabled (‘-x’). The compression level for the compressed output is set to
+‘-z 6’, in order to reduce memory usage in return for a longer compression time. All of the parameters
+for fastp can be changed with ‘--fastp_additional_params’. We chose to use fastp, because it is faster
+than other FASTQ preprocessing tools [
+            <xref ref-type="bibr" rid="ref24">24</xref>
+            ] while offering automatic adapter detection and many
+customization options for experienced users. While using the preprocessed reads, ribosomal RNA
+(rRNA) is removed with SortMeRNA v2.1b [
+            <xref ref-type="bibr" rid="ref22">22</xref>
+            ] when considering all of the available databases for
+SortMeRNA. This step can be skipped with ‘--skip_sortmerna’. Note that we stick to an older version
+2.1b in order to avoid repeated indexing of the databases, which is not available in versions &gt; 4. Besides,
+there are no algorithmic changes between versions 2.1b and 4. The trimmed and rRNA-cleaned reads
+are then mapped with HISAT2 v2.1.0 [
+            <xref ref-type="bibr" rid="ref25">25</xref>
+            ]. The output is directly piped into samtools, converted into
+BAM format, sorted, and then indexed. If the user provides more than one reference genome, all of the
+genomes are concatenated and one index is built and used for mapping. We have chosen HISAT2 as
+mapping software, because it has been continuously developed and maintained for several years [
+            <xref ref-type="bibr" rid="ref26">26</xref>
+            ].
+In addition, a recent study on A. thaliana showed no major differences between RNA-Seq mapping
+tools in the context of DEG detection [
+            <xref ref-type="bibr" rid="ref27">27</xref>
+            ], which was also in accordance with a large RNA-Seq pipeline
+evaluation study recently performed by Corchete et al. [
+            <xref ref-type="bibr" rid="ref17">17</xref>
+            ].
+          </p>
+        </sec>
+        <sec id="sec-2-1-2">
+          <title>2.1.3. Quantification &amp; Differential Gene Expression Analysis</title>
+          <p>
+            All provided GTF annotation files are concatenated and filtered for gene and pseudogene features.
+We use featureCounts v2.0.1 [
+            <xref ref-type="bibr" rid="ref28">28</xref>
+            ] in order to quantify the mapped reads based on this processed
+annotation, chosen as a quantification tool that is highly cited and used in the community. Per default,
+we count non-multi-mapped reads on the exon level and summarize the counts into meta-features on
+the gene level. The strand-specific counting is set to un-stranded by default and it can be changed with
+‘--strand 1’ to stranded and ‘--strand 2’ to reversely stranded. If the user is unsure about the strandness
+of the data, then the pipeline can run first in un-stranded mode, then the alignments can be investigated,
+for example, via IGV [
+            <xref ref-type="bibr" rid="ref29">29</xref>
+            ], and then the pipeline can be resumed (‘-resume’) after the mapping step using
+the appropriate strand information. We implemented a TPM (Transcript Per Million) normalization and
+filter step, as proposed in [
+            <xref ref-type="bibr" rid="ref30">30</xref>
+            ]. For each gene, the TPM value is calculated, followed by the calculation
+of the mean TPM in each condition. A gene needs to have at least one mean TPM greater than the
+threshold (default 1) to be considered in the further pipeline. The user can adjust the threshold with
+‘--tpm’. All of the results so far are summarized in a MultiQC v1.9 [
+            <xref ref-type="bibr" rid="ref31">31</xref>
+            ] report. The filtered count tables
+are passed to the DESeq2 module v1.28.0 [
+            <xref ref-type="bibr" rid="ref32">32</xref>
+            ] as the to date most cited and still maintained tool for DEG
+calling. We apply DESeq2 normalization, as well as different transformations (regularized log (rlog),
+variance stabilizing, and log2(n + 1) transformation) . We generate PCA plots of all samples on all types
+of transformed counts on the 50, 100, and 500 genes with the highest variance and heatmaps on all types
+of transformed counts on the 50 and 100 genes with the highest counts and most variable genes. Next,
+we perform pairwise comparisons, per default all possible comparisons in one direction, and shrink the
+resulting logarithmized fold changes (logFCs) with the lfcShrink and apeglm [
+            <xref ref-type="bibr" rid="ref33">33</xref>
+            ] method (see DESeq2
+vignette for details) comparison-wise. The user can specify specific pairwise comparisons with ‘--deg’.
+The result tables are filtered by adjusted p-value &lt; 0.05 and adjusted p-value &lt; 0.01. The unfiltered
+and filtered tables are available in CSV and Excel format, and as searchable and sortable HTML
+documents, including expression box plots and further information for each gene that is produced
+by the ReportingTools R package [
+            <xref ref-type="bibr" rid="ref34">34</xref>
+            ]. Furthermore, the results are visualized with volcano (that is
+generated with EnhancedVolcano, https://github.com/kevinblighe/EnhancedVolcano), MA and PCA
+plots, sample-to-sample heatmaps, heatmaps on genes with highest counts, on genes with highest
+logFCs, and on DEGs with the highest logFCs. Many of these plots are also summarized in an HTML
+regionReport [
+            <xref ref-type="bibr" rid="ref35">35</xref>
+            ], which allows for a first exploration of the DESeq2 results. For some supported
+species, the pipeline performs an integrated downstream pathway analysis: WebGestalt [
+            <xref ref-type="bibr" rid="ref36">36</xref>
+            ] runs a
+gene set enrichment analysis (GSEA) for Homo sapiens and Mus musculus; and, the piano R package [
+            <xref ref-type="bibr" rid="ref37">37</xref>
+            ]
+performs a GSEA with different settings and consensus scoring for Homo sapiens, Mus musculus, and
+Mesocricetus auratus. We aim to extend the list of supported species in the future and on-demand.
+          </p>
+        </sec>
+        <sec id="sec-2-1-3">
+          <title>2.1.4. Transcriptome Assembly</title>
+          <p>
+            In the absence of an appropriate reference genome, the user might want to first generate a de
+novo transcriptome assembly. Although not the initial focus of our pipeline, we allow, via ‘--assembly’,
+to switch from DEG analysis to basic transcriptome assembly (Figure 1). Following a recent comparison
+study [
+            <xref ref-type="bibr" rid="ref38">38</xref>
+            ], we chose Trinity v2.11.0 [
+            <xref ref-type="bibr" rid="ref39">39</xref>
+            ] in order to assemble the rRNA-free or trimmed reads de
+novo accompanied by a reference-based assembly generated by StringTie2 v2.1.2 [
+            <xref ref-type="bibr" rid="ref40">40</xref>
+            ]. Both of the
+transcriptome assemblies are functionally annotated with dammit v1.2 (http://www.camillescott.org/
+dammit). Dammit unites different databases for annotation: Pfam-A, Rfam, OrthoDB, and BUSCO.
+Besides a pure annotation purpose, the results that are provided by BUSCO v3.0.2 [
+            <xref ref-type="bibr" rid="ref23">23</xref>
+            ] can be used as
+a common metric in order to evaluate the quality and completeness of both transcriptomes that are
+based on expected gene content premised on evolutionary principles.
+2.1.5. Output
+          </p>
+          <p>For each step of the pipeline, all of the essential results, e.g., trimmed read files from fastp and
+BAM files from HISAT2, are easily accessible and they can be used for further investigations outside of
+the pipeline. The plots are provided as PDF files, tables as CSV, and Excel files. A summary or report
+information are generally accessible through the MultiQC report.</p>
+        </sec>
+      </sec>
+      <sec id="sec-2-2">
+        <title>2.2. DEG Validation of RNA-Seq with Publicly Available qRT-PCR Data</title>
+        <p>
+          In order to validate our differential expression analysis procedure, we compared our results
+with publicly available qRT-PCR data considering these data as the gold standard. We adopted,
+like Costa-Silva et al. [
+          <xref ref-type="bibr" rid="ref41">41</xref>
+          ], a real RNA-Seq and qRT-PCR dataset, which is part of the Microarray
+Quality Control (MAQC) project and covers expression data from two conditions that we compare:
+Stratagene Universal Human Reference RNA (UHR) and Ambion Human Brain Reference RNA (Brain).
+The UHR data are composed of total RNA from 10 human cell lines. As part of the MAQC project,
+these are well-characterized datasets, in which, inter alia, over a thousand genes have been examined
+with qRT-PCR [
+          <xref ref-type="bibr" rid="ref42 ref43">42,43</xref>
+          ].
+        </p>
+        <p>
+          The single-end short reads are available under the NCBI Short-Read Archive (SRA) accessions
+SRR037445-SRR037451 (UHR, seven biological replicates) and SRR035678, SRR037439-SRR37444
+(Brain, seven biological replicates) [
+          <xref ref-type="bibr" rid="ref44">44</xref>
+          ]. qRT-PCR data are available under Gene Expression Omnibus
+(GEO) accession GSE5350, platform GPL4097, sample accessions: GSM129638-GSM129641 (UHR),
+and GSM129642-GSM129645 (Brain) [
+          <xref ref-type="bibr" rid="ref42">42</xref>
+          ].
+        </p>
+        <p>Short-read RNA-Seq data were analyzed by our pipeline (branch: master, commit:
+b3cf528f3142a2890287ac8445e7ed44ae187331, and Ensembl release 98) on a high performance
+cluster running the Slurm workload manager. All of the parameters were set to default, except ‘--tpm 0’,
+to skip the TPM filter. The unfiltered DESeq2 result table (available on the Open Science Framework
+(OSF) doi.org/10.17605/OSF.IO/SZEFK) was picked for the comparison.</p>
+        <p>
+          qRT-PCR data were analyzed by adopting an R script (available on OSF doi.org/10.17605/OSF.
+IO/SZEFK) retrieved from https://www.ncbi.nlm.nih.gov/geo/geo2r/ with default parameters and
+differential expression analysis was done with limma v3.42.0 [
+          <xref ref-type="bibr" rid="ref45">45</xref>
+          ]. All of the genes with duplicated
+gene symbols were excluded, in order to ensure a one-to-one mapping between qRT-PCR and
+RNA-Seq results.
+        </p>
+        <p>Both unfiltered result tables were merged by gene symbol, so that each gene of the
+qRT-PCR dataset could be compared with the corresponding result of the RNA-Seq analysis.
+We considered genes to be differentially expressed with an adjusted p-value 0.05 of qRT-PCR
+results. logFC correlation was calculated with the Pearson method and plotted while using ggscatter
+of the ggpubr R package (https://github.com/kassambara/ggpubr).</p>
+      </sec>
+      <sec id="sec-2-3">
+        <title>2.3. Transcriptome Assembly Validation</title>
+        <p>
+          In order to validate the optional transcriptome assembly functionality that is provided by RNAflow,
+we selected three RNA-Seq read sets from different species that were recently used in a large de novo
+transcriptome assembly benchmark [
+          <xref ref-type="bibr" rid="ref38">38</xref>
+          ]. We downloaded all of the assemblies and the corresponding
+raw reads for the E. coli (eco), A. thaliana (ath), and M. musculus (mmu) data sets from OSF (doi.
+org/10.17605/OSF.IO/5ZDX4) and run RNAflow with the ‘--assembly --skip_sortmerna’ options and
+otherwise default parameters on each data set. We skipped the rRNA depletion step, because no
+depletion was performed by Hölzer and Marz [
+          <xref ref-type="bibr" rid="ref38">38</xref>
+          ]. The transcriptome assembly calculations were
+performed with release v1.1.0 of RNAflow. Finally, we benchmarked and visualized RNAflow’s assembly
+results that were achieved with Trinity and StringTie2, together with the ten different assemblies
+from Hölzer and Marz [
+          <xref ref-type="bibr" rid="ref38">38</xref>
+          ] for each data set using BUSCO v3.0.2 and MultiQC v1.9. We selected the
+following BUSCO databases per data set: eco – enterobacteriales_odb9; ath – embryophyta_odb9; mmu –
+euarchontoglires_odb9. All of the assemblies calculated with RNAflow are available at doi.org/10.
+17605/OSF.IO/SZEFK.
+        </p>
+      </sec>
+    </sec>
+    <sec id="sec-3">
+      <title>3. Results and Discussion</title>
+      <sec id="sec-3-1">
+        <title>3.1. The Pipeline Produces Well-Structured Output and Comprehensive Insights into DEGs</title>
+        <p>We ran our pipeline on a well-described data selection that was obtained from the MAQC project,
+covering expression data from two conditions: ‘UHR’ and ‘Brain’. We executed the pipeline on all
+samples and performed a pairwise DEG detection between the two conditions. Here, it was not our
+focus to biologically interpret this data, but to show and evaluate the functionality and output of
+the pipeline. The final output directory is well-structured based on each step and tool, see Figure 2,
+allowing for a straight-forward and clean investigation of all the results. The DESeq2 results can be
+explored in detail at the OSF repository (doi.org/10.17605/OSF.IO/SZEFK). Figure 3 and 4 show a
+selection of unmodified output that is generated by the pipeline. The expression patterns behind both
+conditions are highly diverse, which is reflected in the results and plots, e.g. the heatmap showing
+strong fold change differences between the two conditions (Figure 3A) and the PCA with principal
+component one (PC1) already covering 99 % of the variance in the data (Figure 3B). Accordingly,
+the pipeline detected a large set (n = 20,581, comprising 33.9 % of the input) of significantly (p-value
+0.05) differentially expressed genes that result in dense volcano and MA plots (Figure 3C,D).
+The sample-to-sample heatmap (Figure 3E) shows a clear separation of the two conditions and that
+biological replicates cluster well, which is an important information for the further analysis and
+interpretation of such a data set. Based on a large set of DEGs, the automatically performed GSEA
+reveals affected pathways while using WebGestalt and the piano R package (Figure 4A,B, respectively).</p>
+      </sec>
+      <sec id="sec-3-2">
+        <title>3.2. RNA-Seq Results of the Pipeline Correlate Strongly with qRT-PCR Results</title>
+        <p>Overall, 1044 genes were obtained from the qRT-PCR dataset, of which 1001 have a unique gene
+symbol. 859 genes have an adjusted p-value 0.05. Figure 5 shows the correlations between the
+logFCs of the DESeq2 result from RNAflow and the limma result of the qRT-PCR analysis. A very high
+logFC correlation was obtained with a Pearson correlation coefficient R = 0.95 and p &lt; 2.2 10 16 .
+Note that the R and p-values do not change when changing the adjusted p-value threshold to 0.01,
+0.005, 0.001, or no threshold at all (see Figures A1–A4). This shows that our pipeline is generally
+capable of detecting differentially expressed genes that are based on the performed steps described in
+the implementation part. However, the qRT-PCR data just cover a fraction of genes that are available
+from RNA-Seq: here, 20,581 of 60,623 genes have an adjusted p-value 0.05.</p>
+      </sec>
+      <sec id="sec-3-3">
+        <title>3.3. Transcriptome Assembly Quality Is Comparable with Previously Reported Results</title>
+        <p>
+          In a recent de novo transcriptome assembly study, Hölzer and Marz [
+          <xref ref-type="bibr" rid="ref38">38</xref>
+          ] compared ten
+different short-read assembly tools on nine RNA-Seq data sets spanning different kingdoms of
+life. Here, we selected three of these data sets and applied RNAflow’s assembly functionality.
+Currently, RNAflow implements two approaches for transcriptome assembly: de novo via Trinity
+and reference-based via StringTie2. Next to a functional annotation of the resulting transcripts via
+dammit, the pipeline also outputs a transcriptome completeness metric via BUSCO. For each data set,
+we also downloaded the ten assemblies that were previously calculated by Hölzer and Marz [
+          <xref ref-type="bibr" rid="ref38">38</xref>
+          ] and
+re-analyzed them together with the assemblies that were generated by RNAflow in order to compare
+the number of single-copy orthologs found for each assembly (Figure 6).
+        </p>
+        <p>
+          We see that RNAflow is able to produce a robust transcriptome assembly on different
+data sets (Figure 6), with BinPacker [
+          <xref ref-type="bibr" rid="ref46">46</xref>
+          ] showing the lowest performance in accordance
+with Hölzer and Marz [
+          <xref ref-type="bibr" rid="ref38">38</xref>
+          ]. Interestingly, we observed differences in the BUSCO assessment between
+Trinity and StringTie2, which results in generally more complete single-copy orthologs found
+via the reference-based approach implemented in RNAflow. In particular, for the E. coli data set,
+StringTie2 outperformed all other de novo assembly tools. However, a de novo approach is often
+needed in the absence of an appropriate reference genome and annotation. Note that the light
+differences observed between RNAflow’s Trinity assemblies and the Trinity assemblies previously
+produced by Hölzer and Marz [
+          <xref ref-type="bibr" rid="ref38">38</xref>
+          ] can be explained by differences in the read pre-processing steps
+and the different Trinity versions used (v2.11.0 vs. v2.8.4).
+        </p>
+        <p>10 R = 0.95, p &lt; 2.2e-16</p>
+        <p>
+          Again, we want to stress that RNAflow was primarily developed with the detection of DEGs
+in mind and the assembly functionality was implemented lately as an optional feature. Thus,
+other pipelines, such as the Oyster River Protocol [
+          <xref ref-type="bibr" rid="ref47">47</xref>
+          ], should be preferred if the goal is to calculate
+a comprehensive assembly, in particular, because de novo transcriptome assembly is still a challenging
+task prone to errors [
+          <xref ref-type="bibr" rid="ref48 ref49">48,49</xref>
+          ]. Nevertheless, we show that RNAflow is able to generate a basic assembly
+with comparably good BUSCO metrics in comparison to other assembly tools (Figure 6) and, thus, can be
+also used for a fast and simple assessment of differentially expressed transcripts in the future.
+        </p>
+      </sec>
+      <sec id="sec-3-4">
+        <title>3.4. Comparison with Other RNA-Seq Pipelines</title>
+        <p>
+          In recent years, various RNA-Seq pipelines have been published. While some implementation
+features and tool selections overlap with those provided by RNAflow, reproducible installation and
+execution, as well as a straight-forward usage, differ considerably, see Table A1. The RNA-Seq
+pipeline provided by the nf-core community (nf-core/rnaseq [
+          <xref ref-type="bibr" rid="ref9">9</xref>
+          ]) also employs Nexflow as workflow
+management system, but it does not provide such extensive DEG analysis and visualization as
+implemented in RNAflow. Both pipelines provide true encapsulated containerization, also for the
+operating system, to minimize effects of numerical instability. VIPER [
+          <xref ref-type="bibr" rid="ref4">4</xref>
+          ] and RASflow [
+          <xref ref-type="bibr" rid="ref50">50</xref>
+          ] make use
+of Snakemake [
+          <xref ref-type="bibr" rid="ref51">51</xref>
+          ], another popular bioinformatic workflow management tool. Thus, it is easy to
+parallelize and use Conda in order to install all of its dependencies. In contrast, hppRNA [
+          <xref ref-type="bibr" rid="ref8">8</xref>
+          ] mainly
+uses Perl (https://www.perl.org/) scripts to create a Snakemake file, but it lacks a true dependency
+management system. A graphical user interface comes with TRAPLINE [
+          <xref ref-type="bibr" rid="ref6">6</xref>
+          ] provided within the Galaxy
+framework [
+          <xref ref-type="bibr" rid="ref52">52</xref>
+          ]. OneStopRNAseq [
+          <xref ref-type="bibr" rid="ref53">53</xref>
+          ] offers a web application that requires a login for full usage.
+The back-end is implemented within the Snakemake framework. In addition, OneStopRNAseq seems
+to be limited to six model organisms (see https://mccb.umassmed.edu/OneStopRNAseq/about.php).
+RCP [
+          <xref ref-type="bibr" rid="ref10">10</xref>
+          ] provides scripts for one specific scheduler, Slurm, and is not easily adaptable. Additionally,
+RNAsik [
+          <xref ref-type="bibr" rid="ref7">7</xref>
+          ] and Nextpresso [
+          <xref ref-type="bibr" rid="ref5">5</xref>
+          ] only support specific schedulers with a limited range of basic RNA-Seq
+analyses steps.
+        </p>
+        <p>Taking all of this together, RNAflow combines the most important features of available pipelines
+(Table A1) to provide a reproducible and scalable RNA-Seq workflow that focuses on a comprehensive
+DEG analysis with a minimal set of input parameters. Because of its implementation in the Nextflow
+framework, RNAflow comes with out-of-the-box support for various batch schedulers (SGE, LSF,
+SLURM, PBS, and HTCondor) and cloud platforms (Kubernetes, Amazon AWS, and Google Cloud).</p>
+      </sec>
+    </sec>
+    <sec id="sec-4">
+      <title>4. Conclusions</title>
+      <p>
+        Here, we present RNAflow (publicly available at https://github.com/hoelzer-lab/rnaflow),
+another RNA-Seq-Pipeline, which, however, was implemented within the workflow management
+system Nextflow and, therefore, aims at a very easy handling. Thus, the pipeline is portable,
+scalable, parallelizable, and it ensures a high degree of reproducibility, which are urgently needed
+properties in computer-aided biology and especially in performing standard tasks, such as an RNA-Seq
+DEG analysis [
+        <xref ref-type="bibr" rid="ref54">54</xref>
+        ]. Not only do we automatically address common pitfalls in RNA-Seq expression
+analysis, such as rRNA removal and low abundance feature filtering, but we also offer an in-depth
+differential expression analysis with DESeq2, in contrast to other Nextflow RNA-Seq pipelines, such as
+nf-core/rnaseq [
+        <xref ref-type="bibr" rid="ref9">9</xref>
+        ]. In particular, our comprehensive R scripts constructed around DESeq2 as the
+heart of our pipeline, help users to generate reproducible and rapid results. Thus, the output of the
+DEG analysis includes various visualizations of the result, such as heatmaps, volcano plots, and PCA
+plots. In addition, we provide all of the intermediate result files in a well-structured way for further
+analysis and project-specific assessment. We made sure that the input parameters are as simple as
+possible, so that the users can focus on their scientific question assisted by the results of our pipeline.
+      </p>
+      <sec id="sec-4-1">
+        <title>Future Direction</title>
+        <p>
+          Recently, Di Tommaso et al. [
+          <xref ref-type="bibr" rid="ref11">11</xref>
+          ] showed that the containerization of operating systems is crucial
+in minimizing numerical instability and increasing reproducibility. Thus, we already implemented
+Docker and Singularity support for all of our processes. With full containerization of the pipeline,
+we also plan to distribute RNAflow in the cloud. However, since container technologies, like Docker
+and Singularity, are still not available for all users—e.g., due to security standards or slow introduction
+of new software—we also allow the monitoring of software and database versions, as well as version
+tracking of the pipeline itself, by direct deployment from GitHub with Nextflow while using Conda
+environments. In the future, we will provide stable release versions of the pipeline that can be
+directly pulled via Nextflow in order to allow full reproducibility of the DEG results. We will add
+further profiles to easily deploy the pipeline in different environments while using Conda and/or
+Docker/Singularity.
+        </p>
+        <p>
+          Strand-specific sequencing of the transcriptome enhances the accuracy of the gene
+quantification [
+          <xref ref-type="bibr" rid="ref55">55</xref>
+          ]. However, the user often does not know exactly if and how the data were sequenced
+strand specific. By examination of the mapped reads, we plan to automatically estimate strandness
+to provide a more accurate default setting for featureCounts and reduce another common pitfall
+in RNA-Seq expression analysis. We also plan to further improve the pipeline by adding specific
+modules and parameter settings e.g., for the automatic detection and masking of PCR artefacts, as well
+as support for smallRNA-Seq analyses.
+        </p>
+        <p>
+          Currently, the DEG detection can be only performed based on a provided reference genome.
+This behavior excludes less studied species for which no or no suitable reference genome and no
+annotation are available [
+          <xref ref-type="bibr" rid="ref56">56</xref>
+          ]. By combining the transcriptome assembly with the DEG analysis
+sub-workflow, we intend to directly analyze differentially expressed transcripts in order to overcome
+this current limitation of RNAflow.
+        </p>
+        <p>Author Contributions: Software, M.L. and M.H.; writing—original draft preparation, M.L. and M.H.;
+writing—review and editing, M.H.; visualization, M.L.; supervision, M.H. All authors have read and agreed to
+the published version of the manuscript.</p>
+        <p>Funding: This research received no external funding.</p>
+        <p>Acknowledgments: We thank Lasse Faber for setting up the very basic structure of a Nextflow pipeline and
+Florian Mock for finding and fixing bugs. We also thank Christian Brandt and Adrian Viehweger for fruitful
+discussions about workflow management and container implementations and helpful pieces of Nextflow code.
+M.H. appreciates the support of the Joachim Herz Foundation by the add-on fellowship for interdisciplinary
+life science. The computational experiments were performed on resources of Friedrich Schiller University Jena
+supported in part by DFG grants INST 275/334-1 FUGG and INST 275/363-1 FUGG.</p>
+        <p>Conflicts of Interest: The authors declare no conflict of interest.</p>
+      </sec>
+    </sec>
+    <sec id="sec-5">
+      <title>Appendix A</title>
+      <p>5
+qPCR limma logFC
+10
+15</p>
+      <p>5
+qPCR limma logFC
+10
+15
+Figure A2. Logarithmized fold change correlation between limma results of qRT-PCR and pipeline
+results (DESeq2) of RNA-Seq data filtered by adjusted p-value 0.01 of limma results. The correlation
+was calculated by the Pearson coefficient.</p>
+      <p>5
+qPCR limma logFC
+10
+15</p>
+      <p>5
+qPCR limma logFC
+10
+15
+Figure A4. Logarithmized fold change correlation between limma results of qRT-PCR and pipeline
+results (DESeq2) of RNA-Seq data filtered by adjusted p-value 0.001 of limma results. The correlation
+was calculated by the Pearson coefficient.
+Publisher’s Note: MDPI stays neutral with regard to jurisdictional claims in published maps and institutional
+affiliations.</p>
+    </sec>
+  </body>
+  <back>
+    <ref-list>
+      <ref id="ref1">
+        <mixed-citation>
+          1.
+          <string-name>
+            <surname>Sharma</surname>
+            ,
+            <given-names>C.M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Hoffmann</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Darfeuille</surname>
+            ,
+            <given-names>F.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Reignier</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ; Findeiss,
+          <string-name>
+            <given-names>S.</given-names>
+            ;
+            <surname>Sittka</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>A.</given-names>
+            ;
+            <surname>Chabas</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>S.</given-names>
+            ;
+            <surname>Reiche</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>K.</given-names>
+            ;
+            <surname>Hackermüller</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>J.</surname>
+          </string-name>
+          ; Reinhardt,
+          <string-name>
+            <surname>R.</surname>
+          </string-name>
+          ; et al.
+          <article-title>The primary transcriptome of the major human pathogen Helicobacter pylori</article-title>
+          .
+          <source>Nature</source>
+          <year>2010</year>
+          ,
+          <volume>464</volume>
+          ,
+          <fpage>250</fpage>
+          -
+          <lpage>255</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref2">
+        <mixed-citation>
+          2.
+          <string-name>
+            <surname>Stark</surname>
+            , R.; Grzelak,
+            <given-names>M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Hadfield</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          <article-title>RNA sequencing: The teenage years</article-title>
+          .
+          <source>Nat. Rev. Genet</source>
+          .
+          <year>2019</year>
+          ,
+          <volume>20</volume>
+          ,
+          <fpage>631</fpage>
+          -
+          <lpage>656</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref3">
+        <mixed-citation>
+          3.
+          <string-name>
+            <surname>Simoneau</surname>
+            , J.; Dumontier,
+            <given-names>S.</given-names>
+          </string-name>
+          ; Gosselin,
+          <string-name>
+            <surname>R.</surname>
+          </string-name>
+          ; Scott,
+          <string-name>
+            <surname>M.S. Current</surname>
+          </string-name>
+          <article-title>RNA-seq methodology reporting limits reproducibility</article-title>
+          .
+          <source>Brief. Bioinform</source>
+          .
+          <year>2019</year>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref4">
+        <mixed-citation>
+          4.
+          <string-name>
+            <surname>Cornwell</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Vangala</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Taing</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Herbert</surname>
+            ,
+            <given-names>Z.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Köster</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Li</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Sun</surname>
+            ,
+            <given-names>H.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Li</surname>
+            ,
+            <given-names>T.</given-names>
+          </string-name>
+          ; Zhang, J.;
+          <string-name>
+            <surname>Qiu</surname>
+            ,
+            <given-names>X.</given-names>
+          </string-name>
+          ; et al.
+          <article-title>VIPER: Visualization Pipeline for RNA-seq, a Snakemake workflow for efficient and complete RNA-seq analysis</article-title>
+          .
+          <source>BMC Bioinform</source>
+          .
+          <year>2018</year>
+          ,
+          <volume>19</volume>
+          ,
+          <fpage>135</fpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref5">
+        <mixed-citation>
+          5.
+          <string-name>
+            <surname>Graña</surname>
+            ,
+            <given-names>O.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Rubio-Camarillo</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Fdez-Riverola</surname>
+            ,
+            <given-names>F.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Pisano</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Glez-Peña</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          <article-title>Nextpresso: Next generation sequencing expression analysis pipeline</article-title>
+          .
+          <source>Curr. Bioinform</source>
+          .
+          <year>2018</year>
+          ,
+          <volume>13</volume>
+          ,
+          <fpage>583</fpage>
+          -
+          <lpage>591</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref6">
+        <mixed-citation>
+          6.
+          <string-name>
+            <surname>Wolfien</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Rimmbach</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Schmitz</surname>
+            ,
+            <given-names>U.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Jung</surname>
+            ,
+            <given-names>J.J.</given-names>
+          </string-name>
+          ; Krebs,
+          <string-name>
+            <surname>S.</surname>
+          </string-name>
+          ; Steinhoff,
+          <string-name>
+            <surname>G.</surname>
+          </string-name>
+          ; David,
+          <string-name>
+            <given-names>R.</given-names>
+            ;
+            <surname>Wolkenhauer</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>O.</surname>
+          </string-name>
+          <article-title>TRAPLINE: A standardized and automated pipeline for RNA sequencing data analysis, evaluation and annotation</article-title>
+          .
+          <source>BMC Bioinform</source>
+          .
+          <year>2016</year>
+          ,
+          <volume>17</volume>
+          ,
+          <fpage>1</fpage>
+          -
+          <lpage>11</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref7">
+        <mixed-citation>
+          7.
+          <string-name>
+            <surname>Tsyganov</surname>
+            ,
+            <given-names>K.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Perry</surname>
+            ,
+            <given-names>A.J.</given-names>
+          </string-name>
+          ; Archer,
+          <string-name>
+            <given-names>S.K.</given-names>
+            ;
+            <surname>Powell</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>D.</surname>
+          </string-name>
+          <article-title>RNAsik: A Pipeline for complete and reproducible RNA-seq analysis that runs anywhere with speed and ease</article-title>
+          .
+          <source>J. Open Source Softw</source>
+          .
+          <year>2018</year>
+          ,
+          <volume>3</volume>
+          ,
+          <fpage>583</fpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref8">
+        <mixed-citation>
+          8.
+          <string-name>
+            <surname>Wang</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          <article-title>hppRNA-A Snakemake-based handy parameter-free pipeline for RNA-Seq analysis of numerous samples</article-title>
+          .
+          <source>Briefings Bioinform</source>
+          .
+          <year>2018</year>
+          ,
+          <volume>19</volume>
+          ,
+          <fpage>622</fpage>
+          -
+          <lpage>626</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref9">
+        <mixed-citation>
+          9.
+          <string-name>
+            <surname>Ewels</surname>
+            ,
+            <given-names>P.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Hammarén</surname>
+            ,
+            <given-names>R.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Peltzer</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Moreno</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ; Garcia, M.; rfenouil; marchoeppner; Panneerselvam,
+          <string-name>
+            <surname>S.</surname>
+          </string-name>
+          ; Sven F.
+          <article-title>; jun-wan; et al</article-title>
+          .
+          <source>nf-core/rnaseq: Nf-core/rnaseq version 1.4.2</source>
+          ,
+          <year>2019</year>
+          . Available online: https: //zenodo.org/record/3503887#.
+          <source>X9Hk0LMRVPY (accessed on 9 December</source>
+          <year>2020</year>
+          ). [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref10">
+        <mixed-citation>
+          10.
+          <string-name>
+            <surname>Overbey</surname>
+            ,
+            <given-names>E.G.</given-names>
+          </string-name>
+          ;
+          <article-title>Saravia-</article-title>
+          <string-name>
+            <surname>Butler</surname>
+            ,
+            <given-names>A.M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Zhang</surname>
+            ,
+            <given-names>Z.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Rathi</surname>
+            ,
+            <given-names>K.S.</given-names>
+          </string-name>
+          ; Fogle, H.; da Silveira, W.A.;
+          <string-name>
+            <surname>Barker</surname>
+            ,
+            <given-names>R.J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Bass</surname>
+            ,
+            <given-names>J.J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Beheshti</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Berrios</surname>
+            ,
+            <given-names>D.C.</given-names>
+          </string-name>
+          ; et al.
+          <article-title>NASA GeneLab RNA-Seq Consensus Pipeline: Standardized Processing of Short-Read RNA-Seq Data</article-title>
+          .
+          <source>bioRxiv 2020</source>
+          . Available online: https://www.biorxiv.org/content/early/2020/ 11/10/
+          <year>2020</year>
+          .11.06.371724.full.
+          <source>pdf (accessed on 9 December</source>
+          <year>2020</year>
+          ).
+        </mixed-citation>
+      </ref>
+      <ref id="ref11">
+        <mixed-citation>
+          11.
+          <string-name>
+            <surname>Di</surname>
+            <given-names>Tommaso</given-names>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>P.</given-names>
+            ;
+            <surname>Chatzou</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>M.</given-names>
+            ;
+            <surname>Floden</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>E.W.</surname>
+          </string-name>
+          ; Barja,
+          <string-name>
+            <given-names>P.P.</given-names>
+            ;
+            <surname>Palumbo</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>E.</given-names>
+            ;
+            <surname>Notredame</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>C.</surname>
+          </string-name>
+          <article-title>Nextflow enables reproducible computational workflows</article-title>
+          .
+          <source>Nat. Biotechnol</source>
+          .
+          <year>2017</year>
+          ,
+          <volume>35</volume>
+          ,
+          <fpage>316</fpage>
+          -
+          <lpage>319</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref12">
+        <mixed-citation>
+          12.
+          <string-name>
+            <surname>Merkel</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          <article-title>Docker: Lightweight linux containers for consistent development and deployment</article-title>
+          .
+          <source>Linux J</source>
+          .
+          <year>2014</year>
+          ,
+          <year>2014</year>
+          ,
+          <volume>2</volume>
+          .
+        </mixed-citation>
+      </ref>
+      <ref id="ref13">
+        <mixed-citation>
+          13.
+          <string-name>
+            <surname>Kurtzer</surname>
+            ,
+            <given-names>G.M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Sochat</surname>
+            ,
+            <given-names>V.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Bauer</surname>
+            ,
+            <given-names>M.W.</given-names>
+          </string-name>
+          <string-name>
+            <surname>Singularity</surname>
+          </string-name>
+          :
+          <article-title>Scientific containers for mobility of compute</article-title>
+          .
+          <source>PLoS ONE</source>
+          <year>2017</year>
+          ,
+          <volume>12</volume>
+          ,
+          <year>e0177459</year>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref14">
+        <mixed-citation>
+          14.
+          <string-name>
+            <surname>Jackson</surname>
+            ,
+            <given-names>M.J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Wallace</surname>
+            ,
+            <given-names>E.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Kavoussanakis</surname>
+            ,
+            <given-names>K.</given-names>
+          </string-name>
+          <article-title>Using rapid prototyping to choose a bioinformatics workflow management system</article-title>
+          .
+          <source>bioRxiv 2020</source>
+          . Available online: https://www.biorxiv.org/content/early/2020/08/05/
+          <year>2020</year>
+          .08.04.236208.full.
+          <source>pdf (accessed on 9 December</source>
+          <year>2020</year>
+          ).
+        </mixed-citation>
+      </ref>
+      <ref id="ref15">
+        <mixed-citation>
+          15.
+          <string-name>
+            <surname>Bray</surname>
+            ,
+            <given-names>N.L.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Pimentel</surname>
+            ,
+            <given-names>H.</given-names>
+          </string-name>
+          ; Melsted,
+          <string-name>
+            <given-names>P.</given-names>
+            ;
+            <surname>Pachter</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>L.</surname>
+          </string-name>
+          <article-title>Near-optimal probabilistic RNA-seq quantification</article-title>
+          .
+          <source>Nat. Biotechnol</source>
+          .
+          <year>2016</year>
+          ,
+          <volume>34</volume>
+          ,
+          <fpage>525</fpage>
+          -
+          <lpage>527</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref16">
+        <mixed-citation>
+          16.
+          <string-name>
+            <surname>Patro</surname>
+            , R.; Mount,
+            <given-names>S.M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Kingsford</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          <article-title>Sailfish enables alignment-free isoform quantification from RNA-seq reads using lightweight algorithms</article-title>
+          .
+          <source>Nat. Biotechnol</source>
+          .
+          <year>2014</year>
+          ,
+          <volume>32</volume>
+          ,
+          <fpage>462</fpage>
+          -
+          <lpage>464</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref17">
+        <mixed-citation>
+          17.
+          <string-name>
+            <surname>Corchete</surname>
+            ,
+            <given-names>L.A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Rojas</surname>
+            ,
+            <given-names>E.A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Alonso-López</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>De Las Rivas</surname>
+            , J.; Gutiérrez,
+            <given-names>N.C.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Burguillo</surname>
+            ,
+            <given-names>F.J.</given-names>
+          </string-name>
+          <article-title>Systematic comparison and assessment of RNA-seq procedures for gene expression quantitative analysis</article-title>
+          .
+          <source>Sci. Rep</source>
+          .
+          <year>2020</year>
+          ,
+          <volume>10</volume>
+          ,
+          <fpage>1</fpage>
+          -
+          <lpage>15</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref18">
+        <mixed-citation>
+          18.
+          <string-name>
+            <surname>Harrington</surname>
+            ,
+            <given-names>C.A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Fei</surname>
+            ,
+            <given-names>S.S.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Minnier</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Carbone</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Searles</surname>
+            ,
+            <given-names>R.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Davis</surname>
+            ,
+            <given-names>B.A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Ogle</surname>
+            ,
+            <given-names>K.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Planck</surname>
+            ,
+            <given-names>S.R.</given-names>
+          </string-name>
+          ; Rosenbaum,
+          <string-name>
+            <given-names>J.T.</given-names>
+            ;
+            <surname>Choi</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>D.</surname>
+          </string-name>
+          <article-title>RNA-Seq of human whole blood: Evaluation of globin RNA depletion on Ribo-Zero library method</article-title>
+          .
+          <source>Sci. Rep</source>
+          .
+          <year>2020</year>
+          ,
+          <volume>10</volume>
+          ,
+          <fpage>1</fpage>
+          -
+          <lpage>12</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref19">
+        <mixed-citation>
+          19.
+          <string-name>
+            <surname>Huang</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Sheth</surname>
+            ,
+            <given-names>R.U.</given-names>
+          </string-name>
+          ; Kaufman, A.;
+          <string-name>
+            <surname>Wang</surname>
+            ,
+            <given-names>H.H. Scalable</given-names>
+          </string-name>
+          <article-title>and cost-effective ribonuclease-based rRNA depletion for transcriptomics</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2019</year>
+          ,
+          <volume>48</volume>
+          , e20. Available online: https://academic.oup.com/ nar/article-pdf/48/4/e20/32615496/gkz1169.
+          <source>pdf (accessed on 9 December</source>
+          <year>2020</year>
+          ).
+        </mixed-citation>
+      </ref>
+      <ref id="ref20">
+        <mixed-citation>
+          20.
+          <string-name>
+            <surname>Fauver</surname>
+            ,
+            <given-names>J.R.</given-names>
+          </string-name>
+          ; Akter,
+          <string-name>
+            <given-names>S.</given-names>
+            ;
+            <surname>Morales</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>A.I.O.</given-names>
+            ;
+            <surname>Black</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>W.C.</given-names>
+            ;
+            <surname>Rodriguez</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>A.D.</surname>
+          </string-name>
+          ; Stenglein,
+          <string-name>
+            <surname>M.D.</surname>
+          </string-name>
+          ; Ebel,
+          <string-name>
+            <given-names>G.D.</given-names>
+            ;
+            <surname>Weger-Lucarelli</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>J.</surname>
+          </string-name>
+          <article-title>A reverse-transcription/RNase H based protocol for depletion of mosquito ribosomal RNA facilitates viral intrahost evolution analysis, transcriptomics and pathogen discovery</article-title>
+          .
+          <source>Virology</source>
+          <year>2019</year>
+          ,
+          <volume>528</volume>
+          ,
+          <fpage>181</fpage>
+          -
+          <lpage>197</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref21">
+        <mixed-citation>
+          21.
+          <string-name>
+            <surname>Yates</surname>
+            ,
+            <given-names>A.D.</given-names>
+          </string-name>
+          ; Achuthan,
+          <string-name>
+            <given-names>P.</given-names>
+            ;
+            <surname>Akanni</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>W.</surname>
+          </string-name>
+          ; Allen,
+          <string-name>
+            <given-names>J.</given-names>
+            ;
+            <surname>Allen</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>J.</given-names>
+            ;
+            <surname>Alvarez-Jarreta</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>J.</surname>
+          </string-name>
+          ; Amode,
+          <string-name>
+            <surname>M.R.</surname>
+          </string-name>
+          ; Armean,
+          <string-name>
+            <given-names>I.M.</given-names>
+            ;
+            <surname>Azov</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>A.G.</surname>
+          </string-name>
+          ; Bennett,
+          <string-name>
+            <surname>R.</surname>
+          </string-name>
+          ; et al.
+          <source>Ensembl</source>
+          <year>2020</year>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2020</year>
+          ,
+          <volume>48</volume>
+          ,
+          <fpage>D682</fpage>
+          -
+          <lpage>D688</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref22">
+        <mixed-citation>
+          22.
+          <string-name>
+            <surname>Kopylova</surname>
+          </string-name>
+          , E.;
+          <string-name>
+            <surname>Noé</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Touzet</surname>
+            ,
+            <given-names>H.</given-names>
+          </string-name>
+          <article-title>SortMeRNA: Fast and accurate filtering of ribosomal RNAs in metatranscriptomic data</article-title>
+          .
+          <source>Bioinformatics</source>
+          <year>2012</year>
+          ,
+          <volume>28</volume>
+          ,
+          <fpage>3211</fpage>
+          -
+          <lpage>3217</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref23">
+        <mixed-citation>
+          23.
+          <string-name>
+            <surname>Waterhouse</surname>
+            ,
+            <given-names>R.M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Seppey</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Simão</surname>
+            ,
+            <given-names>F.A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Manni</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Ioannidis</surname>
+            ,
+            <given-names>P.</given-names>
+          </string-name>
+          ; Klioutchnikov,
+          <string-name>
+            <given-names>G.</given-names>
+            ;
+            <surname>Kriventseva</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>E.V.</given-names>
+            ;
+            <surname>Zdobnov</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>E.M.</surname>
+          </string-name>
+          <article-title>BUSCO applications from quality assessments to gene prediction and phylogenomics</article-title>
+          .
+          <source>Mol. Biol. Evol</source>
+          .
+          <year>2018</year>
+          ,
+          <volume>35</volume>
+          ,
+          <fpage>543</fpage>
+          -
+          <lpage>548</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref24">
+        <mixed-citation>
+          24.
+          <string-name>
+            <surname>Chen</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Zhou</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Chen</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Gu</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          <article-title>fastp: An ultra-fast all-in-one FASTQ preprocessor</article-title>
+          .
+          <source>Bioinformatics</source>
+          <year>2018</year>
+          ,
+          <volume>34</volume>
+          ,
+          <fpage>i884</fpage>
+          -
+          <lpage>i890</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref25">
+        <mixed-citation>
+          25.
+          <string-name>
+            <surname>Kim</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Langmead</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Salzberg</surname>
+            ,
+            <given-names>S.L.</given-names>
+          </string-name>
+          <article-title>HISAT: A fast spliced aligner with low memory requirements</article-title>
+          .
+          <source>Nat. Methods</source>
+          <year>2015</year>
+          ,
+          <volume>12</volume>
+          ,
+          <fpage>357</fpage>
+          -
+          <lpage>360</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref26">
+        <mixed-citation>
+          26.
+          <string-name>
+            <surname>Simoneau</surname>
+            , J.; Gosselin,
+            <given-names>R.</given-names>
+          </string-name>
+          ; Scott,
+          <string-name>
+            <surname>M.S.</surname>
+          </string-name>
+          <article-title>Factorial study of the RNA-seq computational workflow identifies biases as technical gene signatures</article-title>
+          .
+          <source>NAR Genom. Bioinform</source>
+          .
+          <year>2020</year>
+          ,
+          <volume>2</volume>
+          ,
+          <fpage>2</fpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref27">
+        <mixed-citation>
+          27.
+          <string-name>
+            <surname>Schaarschmidt</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Fischer</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Zuther</surname>
+            ,
+            <given-names>E.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Hincha</surname>
+            ,
+            <given-names>D.K.</given-names>
+          </string-name>
+          <article-title>Evaluation of Seven Different RNA-Seq Alignment Tools Based on Experimental Data from the Model Plant Arabidopsis thaliana</article-title>
+          .
+          <source>Int. J. Mol. Sci</source>
+          .
+          <year>2020</year>
+          ,
+          <volume>21</volume>
+          ,
+          <fpage>1720</fpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref28">
+        <mixed-citation>
+          28.
+          <string-name>
+            <surname>Liao</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Smyth</surname>
+            ,
+            <given-names>G.K.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Shi</surname>
+            ,
+            <given-names>W.</given-names>
+          </string-name>
+          <article-title>featureCounts: An efficient general purpose program for assigning sequence reads to genomic features</article-title>
+          .
+          <source>Bioinformatics</source>
+          <year>2014</year>
+          ,
+          <volume>30</volume>
+          ,
+          <fpage>923</fpage>
+          -
+          <lpage>930</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref29">
+        <mixed-citation>
+          29.
+          <string-name>
+            <surname>Robinson</surname>
+          </string-name>
+          , J.T.;
+          <string-name>
+            <surname>Thorvaldsdóttir</surname>
+            ,
+            <given-names>H.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Wenger</surname>
+            ,
+            <given-names>A.M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Zehir</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Mesirov</surname>
+            ,
+            <given-names>J.P.</given-names>
+          </string-name>
+          <string-name>
+            <surname>Variant</surname>
+          </string-name>
+          <article-title>Review with the Integrative Genomics Viewer</article-title>
+          .
+          <source>Cancer Res</source>
+          .
+          <year>2017</year>
+          ,
+          <volume>77</volume>
+          ,
+          <fpage>e31</fpage>
+          -
+          <lpage>e34</lpage>
+          . Available online: https://cancerres.aacrjournals.org/ content/77/21/e31.full.
+          <source>pdf (accessed on 9 December</source>
+          <year>2020</year>
+          ).
+        </mixed-citation>
+      </ref>
+      <ref id="ref30">
+        <mixed-citation>
+          30.
+          <string-name>
+            <surname>Li</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Ruotti</surname>
+            ,
+            <given-names>V.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Stewart</surname>
+            ,
+            <given-names>R.M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Thomson</surname>
+            ,
+            <given-names>J.A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Dewey</surname>
+            ,
+            <given-names>C.N.</given-names>
+          </string-name>
+          <article-title>RNA-Seq gene expression estimation with read mapping uncertainty</article-title>
+          .
+          <source>Bioinformatics</source>
+          <year>2010</year>
+          ,
+          <volume>26</volume>
+          ,
+          <fpage>493</fpage>
+          -
+          <lpage>500</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref31">
+        <mixed-citation>
+          31.
+          <string-name>
+            <surname>Ewels</surname>
+            ,
+            <given-names>P.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Magnusson</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Lundin</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ; Käller,
+          <string-name>
+            <surname>M.</surname>
+          </string-name>
+          <article-title>MultiQC: Summarize analysis results for multiple tools and samples in a single report</article-title>
+          .
+          <source>Bioinformatics</source>
+          <year>2016</year>
+          ,
+          <volume>32</volume>
+          ,
+          <fpage>3047</fpage>
+          -
+          <lpage>3048</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref32">
+        <mixed-citation>
+          32.
+          <string-name>
+            <surname>Love</surname>
+            ,
+            <given-names>M.I.</given-names>
+          </string-name>
+          ; Huber,
+          <string-name>
+            <surname>W.</surname>
+          </string-name>
+          ; Anders,
+          <string-name>
+            <surname>S.</surname>
+          </string-name>
+          <article-title>Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2</article-title>
+          .
+          <source>Genome Biol</source>
+          .
+          <year>2014</year>
+          ,
+          <volume>15</volume>
+          ,
+          <fpage>550</fpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref33">
+        <mixed-citation>
+          33.
+          <string-name>
+            <surname>Zhu</surname>
+            ,
+            <given-names>A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Ibrahim</surname>
+            ,
+            <given-names>J.G.</given-names>
+          </string-name>
+          ; Love,
+          <string-name>
+            <surname>M.I.</surname>
+          </string-name>
+          <article-title>Heavy-tailed prior distributions for sequence count data: Removing the noise and preserving large differences</article-title>
+          .
+          <source>Bioinformatics</source>
+          <year>2019</year>
+          , 35,
+          <fpage>2084</fpage>
+          -
+          <lpage>2092</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref34">
+        <mixed-citation>
+          34.
+          <string-name>
+            <surname>Huntley</surname>
+            ,
+            <given-names>M.A.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Larson</surname>
+            ,
+            <given-names>J.L.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Chaivorapol</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Becker</surname>
+            ,
+            <given-names>G.</given-names>
+          </string-name>
+          ; Lawrence,
+          <string-name>
+            <given-names>M.</given-names>
+            ;
+            <surname>Hackney</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>J.A.</given-names>
+            ;
+            <surname>Kaminker</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>J.S.</surname>
+          </string-name>
+          <article-title>ReportingTools: An automated result processing and presentation toolkit for high-throughput genomic analyses</article-title>
+          .
+          <source>Bioinformatics</source>
+          <year>2013</year>
+          ,
+          <volume>29</volume>
+          ,
+          <fpage>3220</fpage>
+          -
+          <lpage>3221</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref35">
+        <mixed-citation>
+          35.
+          <string-name>
+            <surname>Collado-Torres</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Jaffe</surname>
+            ,
+            <given-names>A.E.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Leek</surname>
+            ,
+            <given-names>J.T.</given-names>
+          </string-name>
+          <article-title>regionReport: Interactive reports for region-level and feature-level genomic analyses</article-title>
+          .
+          <source>F1000Research</source>
+          <year>2015</year>
+          ,
+          <volume>4</volume>
+          ,
+          <fpage>105</fpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref36">
+        <mixed-citation>
+          36.
+          <string-name>
+            <surname>Liao</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Wang</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Jaehnig</surname>
+            ,
+            <given-names>E.J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Shi</surname>
+            ,
+            <given-names>Z.</given-names>
+          </string-name>
+          ; Zhang,
+          <string-name>
+            <surname>B. WebGestalt</surname>
+          </string-name>
+          <year>2019</year>
+          :
+          <article-title>Gene set analysis toolkit with revamped UIs and APIs</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2019</year>
+          ,
+          <volume>47</volume>
+          ,
+          <fpage>W199</fpage>
+          -
+          <lpage>W205</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref37">
+        <mixed-citation>
+          37.
+          <string-name>
+            <surname>Väremo</surname>
+            ,
+            <given-names>L.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Nielsen</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Nookaew</surname>
+            ,
+            <given-names>I.</given-names>
+          </string-name>
+          <article-title>Enriching the gene set analysis of genome-wide data by incorporating directionality of gene expression and combining statistical hypotheses and methods</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2013</year>
+          ,
+          <volume>41</volume>
+          ,
+          <fpage>4378</fpage>
+          -
+          <lpage>4391</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref38">
+        <mixed-citation>
+          38.
+          <string-name>
+            <surname>Hölzer</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Marz</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          <article-title>De novo transcriptome assembly: A comprehensive cross-species comparison of short-read RNA-Seq assemblers</article-title>
+          .
+          <source>Gigascience</source>
+          <year>2019</year>
+          ,
+          <volume>8</volume>
+          ,
+          <fpage>giz039</fpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref39">
+        <mixed-citation>
+          39.
+          <string-name>
+            <surname>Grabherr</surname>
+            ,
+            <given-names>M.G.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Haas</surname>
+            ,
+            <given-names>B.J.</given-names>
+          </string-name>
+          ; Yassour,
+          <string-name>
+            <given-names>M.</given-names>
+            ;
+            <surname>Levin</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>J.Z.</given-names>
+            ;
+            <surname>Thompson</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>D.A.</given-names>
+            ;
+            <surname>Amit</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>I.</given-names>
+            ;
+            <surname>Adiconis</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>X.</given-names>
+            ;
+            <surname>Fan</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>L.</given-names>
+            ;
+            <surname>Raychowdhury</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>R.</surname>
+          </string-name>
+          ; Zeng,
+          <string-name>
+            <surname>Q.</surname>
+          </string-name>
+          ; et al.
+          <article-title>Full-length transcriptome assembly from RNA-Seq data without a reference genome</article-title>
+          .
+          <source>Nat. Biotechnol</source>
+          .
+          <year>2011</year>
+          ,
+          <volume>29</volume>
+          ,
+          <fpage>644</fpage>
+          -
+          <lpage>652</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref40">
+        <mixed-citation>
+          40.
+          <string-name>
+            <surname>Kovaka</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Zimin</surname>
+            ,
+            <given-names>A.V.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Pertea</surname>
+            ,
+            <given-names>G.M.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Razaghi</surname>
+            ,
+            <given-names>R.</given-names>
+          </string-name>
+          ; Salzberg,
+          <string-name>
+            <given-names>S.L.</given-names>
+            ;
+            <surname>Pertea</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>M.</surname>
+          </string-name>
+          <article-title>Transcriptome assembly from long-read RNA-seq alignments with StringTie2</article-title>
+          .
+          <source>Genome Biol</source>
+          .
+          <year>2019</year>
+          ,
+          <volume>20</volume>
+          ,
+          <fpage>1</fpage>
+          -
+          <lpage>13</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref41">
+        <mixed-citation>
+          41.
+          <string-name>
+            <surname>Costa-Silva</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Domingues</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Lopes</surname>
+            ,
+            <given-names>F.M.</given-names>
+          </string-name>
+          <article-title>RNA-Seq differential expression analysis: An extended review and a software tool</article-title>
+          .
+          <source>PLoS ONE</source>
+          <year>2017</year>
+          ,
+          <volume>12</volume>
+          ,
+          <year>e0190152</year>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref42">
+        <mixed-citation>
+          42. MAQC Consortium; Shi,
+          <string-name>
+            <given-names>L.</given-names>
+            ;
+            <surname>Reid</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>L.H.</given-names>
+            ;
+            <surname>Jones</surname>
+          </string-name>
+          , W.D.; Shippy,
+          <string-name>
+            <surname>R.</surname>
+          </string-name>
+          ; Warrington,
+          <string-name>
+            <given-names>J.A.</given-names>
+            ;
+            <surname>Baker</surname>
+          </string-name>
+          ,
+          <string-name>
+            <given-names>S.C.</given-names>
+            ; Collins, P.J.; de Longueville, F.;
+            <surname>Kawasaki</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>E.S.</surname>
+          </string-name>
+          ; et al.
+          <article-title>The MicroArray Quality Control (MAQC) project shows interand intraplatform reproducibility of gene expression measurements</article-title>
+          .
+          <source>Nat. Biotechnol</source>
+          .
+          <year>2006</year>
+          ,
+          <volume>24</volume>
+          ,
+          <fpage>1151</fpage>
+          -
+          <lpage>1161</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref43">
+        <mixed-citation>
+          43.
+          <string-name>
+            <surname>Canales</surname>
+            , R.D.; Luo,
+            <given-names>Y.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Willey</surname>
+            ,
+            <given-names>J.C.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Austermiller</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Barbacioru</surname>
+            ,
+            <given-names>C.C.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Boysen</surname>
+            ,
+            <given-names>C.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Hunkapiller</surname>
+            ,
+            <given-names>K.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Jensen</surname>
+            ,
+            <given-names>R.V.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Knight</surname>
+            ,
+            <given-names>C.R.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Lee</surname>
+            ,
+            <given-names>K.Y.</given-names>
+          </string-name>
+          ; et al.
+          <article-title>Evaluation of DNA microarray results with quantitative gene expression platforms</article-title>
+          .
+          <source>Nat. Biotechnol</source>
+          .
+          <year>2006</year>
+          ,
+          <volume>24</volume>
+          ,
+          <fpage>1115</fpage>
+          -
+          <lpage>1122</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref44">
+        <mixed-citation>
+          44.
+          <string-name>
+            <surname>Bullard</surname>
+            ,
+            <given-names>J.H.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Purdom</surname>
+            ,
+            <given-names>E.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Hansen</surname>
+            ,
+            <given-names>K.D.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Dudoit</surname>
+            ,
+            <given-names>S.</given-names>
+          </string-name>
+          <article-title>Evaluation of statistical methods for normalization and differential expression in mRNA-Seq experiments</article-title>
+          .
+          <source>BMC Bioinform</source>
+          .
+          <year>2010</year>
+          ,
+          <volume>11</volume>
+          ,
+          <fpage>94</fpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref45">
+        <mixed-citation>
+          45.
+          <string-name>
+            <surname>Ritchie</surname>
+            ,
+            <given-names>M.E.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Phipson</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Wu</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Hu</surname>
+            ,
+            <given-names>Y.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Law</surname>
+            ,
+            <given-names>C.W.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Shi</surname>
+            ,
+            <given-names>W.</given-names>
+          </string-name>
+          ; Smyth,
+          <string-name>
+            <surname>G.K.</surname>
+          </string-name>
+          <article-title>limma powers differential expression analyses for RNA-sequencing and microarray studies</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2015</year>
+          ,
+          <volume>43</volume>
+          ,
+          <year>e47</year>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref46">
+        <mixed-citation>
+          46.
+          <string-name>
+            <surname>Liu</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Li</surname>
+            ,
+            <given-names>G.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Chang</surname>
+            ,
+            <given-names>Z.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Yu</surname>
+            ,
+            <given-names>T.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Liu</surname>
+            ,
+            <given-names>B.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>McMullen</surname>
+            ,
+            <given-names>R.</given-names>
+          </string-name>
+          ; Chen,
+          <string-name>
+            <given-names>P.</given-names>
+            ;
+            <surname>Huang</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>X.</surname>
+          </string-name>
+          <article-title>BinPacker: Packing-based de novo transcriptome assembly from RNA-seq data</article-title>
+          .
+          <source>PLoS Comput. Biol</source>
+          .
+          <year>2016</year>
+          ,
+          <volume>12</volume>
+          ,
+          <year>e1004772</year>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref47">
+        <mixed-citation>
+          47.
+          <string-name>
+            <surname>MacManes</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>M.D. The Oyster River Protocol</surname>
+          </string-name>
+          :
+          <article-title>A multi-assembler and kmer approach for de novo transcriptome assembly</article-title>
+          .
+          <source>PeerJ</source>
+          <year>2018</year>
+          ,
+          <volume>6</volume>
+          ,
+          <fpage>e5428</fpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref48">
+        <mixed-citation>
+          48.
+          <string-name>
+            <surname>Freedman</surname>
+            ,
+            <given-names>A.H.</given-names>
+          </string-name>
+          ; Clamp,
+          <string-name>
+            <given-names>M.</given-names>
+            ;
+            <surname>Sackton</surname>
+          </string-name>
+          , T.B.
+          <article-title>Error, noise and bias in de novo transcriptome assemblies</article-title>
+          .
+          <source>Mol. Ecol. Resour</source>
+          .
+          <year>2020</year>
+          ,
+          <fpage>1</fpage>
+          -
+          <lpage>12</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref49">
+        <mixed-citation>
+          49.
+          <string-name>
+            <surname>Hölzer</surname>
+            ,
+            <given-names>M.</given-names>
+          </string-name>
+          <article-title>A decade of de novo transcriptome assembly: Are we there yet? Mol</article-title>
+          . Ecol. Resour.
+          <year>2020</year>
+          , 1-
+          <fpage>3</fpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref50">
+        <mixed-citation>
+          50.
+          <string-name>
+            <surname>Zhang</surname>
+            ,
+            <given-names>X.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Jonassen</surname>
+            ,
+            <given-names>I.</given-names>
+          </string-name>
+          <article-title>RASflow: An RNA-Seq analysis workflow with Snakemake</article-title>
+          .
+          <source>BMC Bioinform</source>
+          .
+          <year>2020</year>
+          ,
+          <volume>21</volume>
+          ,
+          <fpage>1</fpage>
+          -
+          <lpage>9</lpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+      <ref id="ref51">
+        <mixed-citation>
+          51.
+          <string-name>
+            <surname>Köster</surname>
+            , J.; Rahmann,
+            <given-names>S.</given-names>
+          </string-name>
+          <article-title>Snakemake-A scalable bioinformatics workflow engine</article-title>
+          .
+          <source>Bioinformatics</source>
+          <year>2012</year>
+          ,
+          <volume>28</volume>
+          ,
+          <fpage>2520</fpage>
+          -
+          <lpage>2522</lpage>
+          . Available online: https://academic.oup.com/bioinformatics/article-pdf/28/19/2520/ 819790/bts480.
+          <source>pdf (accessed on 9 December</source>
+          <year>2020</year>
+          ).
+        </mixed-citation>
+      </ref>
+      <ref id="ref52">
+        <mixed-citation>
+          52.
+          <string-name>
+            <surname>Afgan</surname>
+          </string-name>
+          , E.;
+          <string-name>
+            <surname>Baker</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Batut</surname>
+          </string-name>
+          , B.; van den Beek, M.;
+          <string-name>
+            <surname>Bouvier</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ; Cˇ ech, M.;
+          <string-name>
+            <surname>Chilton</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Clements</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Coraor</surname>
+            ,
+            <given-names>N.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Grüning</surname>
+            ,
+            <given-names>B.A.</given-names>
+          </string-name>
+          ; et al.
+          <article-title>The Galaxy platform for accessible, reproducible and collaborative biomedical analyses: 2018 update</article-title>
+          .
+          <source>Nucleic Acids Res</source>
+          .
+          <year>2018</year>
+          ,
+          <volume>46</volume>
+          ,
+          <fpage>W537</fpage>
+          -
+          <lpage>W544</lpage>
+          . Available online: https://academic.oup.com/nar/ article-pdf/46/W1/W537/25110642/gky379.
+          <source>pdf (accessed on 9 December</source>
+          <year>2020</year>
+          ).
+        </mixed-citation>
+      </ref>
+      <ref id="ref53">
+        <mixed-citation>
+          53.
+          <string-name>
+            <surname>Li</surname>
+            ,
+            <given-names>R.</given-names>
+          </string-name>
+          ; Hu,
+          <string-name>
+            <given-names>K.</given-names>
+            ; Liu, H.;
+            <surname>Green</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>M.R.</surname>
+          </string-name>
+          ; Zhu,
+          <string-name>
+            <surname>L.J.</surname>
+          </string-name>
+          <article-title>OneStopRNAseq: A Web Application for Comprehensive and Efficient Analyses of RNA-Seq Data</article-title>
+          .
+          <source>Genes</source>
+          <year>2020</year>
+          ,
+          <volume>11</volume>
+          ,
+          <fpage>1165</fpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref54">
+        <mixed-citation>
+          54.
+          <string-name>
+            <surname>Perkel</surname>
+            ,
+            <given-names>J.M.</given-names>
+          </string-name>
+          <article-title>Workflow systems turn raw data into scientific knowledge</article-title>
+          .
+          <source>Natur</source>
+          <year>2019</year>
+          ,
+          <volume>573</volume>
+          ,
+          <fpage>149</fpage>
+          -
+          <lpage>150</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref55">
+        <mixed-citation>
+          55.
+          <string-name>
+            <surname>Sarantopoulou</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Tang</surname>
+          </string-name>
+          , S.Y.;
+          <string-name>
+            <surname>Ricciotti</surname>
+            ,
+            <given-names>E.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Lahens</surname>
+            ,
+            <given-names>N.F.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Lekkas</surname>
+            ,
+            <given-names>D.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Schug</surname>
+            ,
+            <given-names>J.</given-names>
+          </string-name>
+          ;
+          <string-name>
+            <surname>Guo</surname>
+            ,
+            <given-names>X.S.</given-names>
+          </string-name>
+          ; Paschos,
+          <string-name>
+            <surname>G.K.</surname>
+          </string-name>
+          ; FitzGerald,
+          <string-name>
+            <given-names>G.A.</given-names>
+            ;
+            <surname>Pack</surname>
+          </string-name>
+          ,
+          <string-name>
+            <surname>A.I.</surname>
+          </string-name>
+          ; et al.
+          <article-title>Comparative evaluation of RNA-Seq library preparation methods for strand-specificity and low input</article-title>
+          .
+          <source>Sci. Rep</source>
+          .
+          <year>2019</year>
+          ,
+          <volume>9</volume>
+          ,
+          <fpage>1</fpage>
+          -
+          <lpage>10</lpage>
+          . [CrossRef] [PubMed]
+        </mixed-citation>
+      </ref>
+      <ref id="ref56">
+        <mixed-citation>
+          56.
+          <string-name>
+            <surname>Salzberg</surname>
+            ,
+            <given-names>S.L.</given-names>
+          </string-name>
+          <article-title>Next-generation genome annotation: We still struggle to get it right</article-title>
+          .
+          <source>Genome Biol</source>
+          <year>2019</year>
+          ,
+          <volume>20</volume>
+          ,
+          <fpage>92</fpage>
+          . [CrossRef]
+        </mixed-citation>
+      </ref>
+    </ref-list>
+  </back>
+</article>
